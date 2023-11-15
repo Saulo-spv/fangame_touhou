@@ -26,6 +26,11 @@ class Player(pygame.sprite.Sprite):
         self.all_sprites = all_sprites
         self.bullets = bullets
 
+        # Variáveis para controle de tiro
+        self.last_shot_time = 0
+        self.shoot_cooldown = 200
+        self.space_pressed = False
+
     def update(self):
         # Configura a movimentação
         keys = pygame.key.get_pressed()
@@ -60,12 +65,12 @@ class Player(pygame.sprite.Sprite):
         else:
             self.current_line = 0
 
-        # Dispara o tiro
-        if keys[pygame.K_SPACE]:
+        # Dispara o tiro se a tecla de espaço for pressionada e o cooldown permitir
+        if keys[pygame.K_SPACE] and self.can_shoot():
             self.fire_bullet()
+            self.space_pressed = True
 
         self.screen_limit()
-
         self.update_animation()
 
     def screen_limit(self):
@@ -78,6 +83,12 @@ class Player(pygame.sprite.Sprite):
         bullet = Bullet(self.rect.centerx, self.rect.top, self.sprite_sheet)
         self.all_sprites.add(bullet)
         self.bullets.add(bullet)
+        self.last_shot_time = pygame.time.get_ticks()
+
+    def can_shoot(self):
+        # Verifica se o tempo desde o último tiro é maior que o cooldown
+        now = pygame.time.get_ticks()
+        return now - self.last_shot_time > self.shoot_cooldown
 
     def update_animation(self):
         # Ajusta a velocidade da animação
@@ -105,7 +116,7 @@ class Bullet(pygame.sprite.Sprite):
         self.image = sprite_sheet.subsurface(pygame.Rect(bullet_x, bullet_y, bullet_width, bullet_height)).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.midbottom = (x, y)
-        self.speed = 10
+        self.speed = 5
 
     def update(self):
         self.rect.y -= self.speed
