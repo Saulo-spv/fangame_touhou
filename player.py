@@ -115,7 +115,7 @@ class Bullet(pygame.sprite.Sprite):
         # Inicializa e posiciona o tiro
         self.image = sprite_sheet.subsurface(pygame.Rect(bullet_x, bullet_y, bullet_width, bullet_height)).convert_alpha()
         self.rect = self.image.get_rect()
-        self.rect.midbottom = (x, y)
+        self.rect.midbottom = (x+10, y+10)
         self.speed = 5
 
     def update(self):

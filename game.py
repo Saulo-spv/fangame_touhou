@@ -37,4 +37,4 @@ class Game:
 
             # Atualiza a tela
             pygame.display.flip()
-            self.clock.tick(60)
+            self.clock.tick(30)
