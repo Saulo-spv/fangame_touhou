@@ -1,31 +1,16 @@
 import pygame
 import sys
-
-class Game():
-    def __init__(self):
-        pass
-    
-    def run(self):
-        pass
-
+from game import Game
 
 if __name__ == '__main__':
     pygame.init()
 
-    screen_width = 600
-    screen_height = 800
+    screen_width = 800
+    screen_height = 600
     screen = pygame.display.set_mode((screen_width, screen_height))
 
-    game = Game()
-    clock = pygame.time.Clock()
+    game = Game(screen)
+    game.run()
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-        game.run()
-
-        pygame.display.flip()
-        clock.tick(60)
+    pygame.quit()
+    sys.exit()
