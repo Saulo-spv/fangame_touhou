@@ -1,5 +1,7 @@
 import pygame
 
+from classes.bullets import PlayerBullet
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, sprite_sheet, all_sprites, bullets):
         super().__init__()
@@ -22,12 +24,21 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (self.screen_width // 2, self.screen_height - 50)
 
+        # Posição do tiro no sprite sheet
+        bullet_x = 0
+        bullet_y = 150
+        bullet_width = 16
+        bullet_height = 16
+
+        # Configura a imagem do tiro
+        self.bullet_image = sprite_sheet.subsurface(pygame.Rect(bullet_x, bullet_y, bullet_width, bullet_height)).convert_alpha()
+
         self.speed = 5
         self.all_sprites = all_sprites
         self.bullets = bullets
 
         # Variáveis para controle de tiro
-        self.last_shot_time = 0
+        self.last_shoot_time = 0
         self.shoot_cooldown = 200
         self.space_pressed = False
 
@@ -80,15 +91,15 @@ class Player(pygame.sprite.Sprite):
 
     def fire_bullet(self):
         # Cria um novo tiro e o adiciona ao grupo de sprites
-        bullet = Bullet(self.rect.centerx, self.rect.top, self.sprite_sheet)
+        bullet = PlayerBullet((self.rect.centerx, self.rect.top), self.bullet_image)
         self.all_sprites.add(bullet)
         self.bullets.add(bullet)
-        self.last_shot_time = pygame.time.get_ticks()
+        self.last_shoot_time = pygame.time.get_ticks()
 
     def can_shoot(self):
         # Verifica se o tempo desde o último tiro é maior que o cooldown
         now = pygame.time.get_ticks()
-        return now - self.last_shot_time > self.shoot_cooldown
+        return now - self.last_shoot_time > self.shoot_cooldown
 
     def update_animation(self):
         # Ajusta a velocidade da animação
@@ -101,26 +112,3 @@ class Player(pygame.sprite.Sprite):
         self.image = self.sprite_sheet.subsurface(pygame.Rect(self.x, self.y, self.sprite_width, self.sprite_height)).convert_alpha()
 
         self.image = pygame.transform.scale(self.image, (60, 60))
-
-class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, sprite_sheet):
-        super().__init__()
-
-        # Posição do tiro no sprite sheet
-        bullet_x = 0
-        bullet_y = 150
-        bullet_width = 16
-        bullet_height = 16 
-
-        # Inicializa e posiciona o tiro
-        self.image = sprite_sheet.subsurface(pygame.Rect(bullet_x, bullet_y, bullet_width, bullet_height)).convert_alpha()
-        self.rect = self.image.get_rect()
-        self.rect.midbottom = (x+10, y+10)
-        self.speed = 5
-
-    def update(self):
-        self.rect.y -= self.speed
-
-        # Remove o tiro quando atinge o topo da tela
-        if self.rect.bottom < 0:
-            self.kill()
