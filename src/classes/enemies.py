@@ -3,13 +3,14 @@ import random
 
 from classes.bullets import *
 
+
 class Enemy(pygame.sprite.Sprite):
     '''Classe abstrata base dos inimigos'''
 
     def __init__(self, all_sprites, bullets, shoot_cooldown):
         super().__init__()
 
-        self._speed = random.uniform(0.8, 0.9)
+        self.speed = random.uniform(0.8, 0.9)
 
         self.screen_height = pygame.display.get_surface().get_height()
         self.screen_width = pygame.display.get_surface().get_width()
@@ -31,6 +32,7 @@ class Enemy(pygame.sprite.Sprite):
 
         if self.rect.top >= 600:
             self.kill()
+
 
 class EnemyType1(Enemy):
 
@@ -65,6 +67,7 @@ class EnemyType1(Enemy):
 
         if self.rect.left <= 0 or self.rect.right >= 800:
             self._x_speed *= -1
+
 
 class EnemyType2(Enemy):
 
@@ -133,6 +136,7 @@ class EnemyType2(Enemy):
 
 
 class FairyType1(EnemyType2):
+
     sprites = [
         pygame.image.load("assets/images/enemies/fairy1_0.png"), 
         pygame.image.load("assets/images/enemies/fairy1_1.png"), 
@@ -147,15 +151,35 @@ class FairyType1(EnemyType2):
         pygame.image.load("assets/images/enemies/turn1_3.png")
     ]
     
-    def __init__(self, all_sprites, bullets, shoot_cooldown):
-        super().__init__(all_sprites, bullets, self.sprites[0], shoot_cooldown)
+    def __init__(self, all_sprites, bullets):
+        super().__init__(all_sprites, bullets, self.sprites[0], 1500)
+    
+    def fire_bullet(self):
+        # Cria os novos tiros e os adicionam ao grupo de sprites
+        bullets = [
+            EnemyBullet1((self.rect.centerx, self.rect.centery), 0),
+            EnemyBullet1((self.rect.centerx, self.rect.centery), 90),
+            EnemyBullet1((self.rect.centerx, self.rect.centery), 180),
+            EnemyBullet1((self.rect.centerx, self.rect.centery), 270),
+        ]
+
+        self.all_sprites.add(bullets)
+        self.bullets.add(bullets)
+
+        self.last_shoot_time = pygame.time.get_ticks()
     
     def update(self):
         super().update()
         self.update_animation(self.sprites, self.sprites_turn)
         self.move()
 
+        # Atira se conseguir
+        if self.can_shoot():
+            self.fire_bullet()
+
+
 class FairyType2(EnemyType2):
+
     sprites = [
         pygame.image.load("assets/images/enemies/fairy2_0.png"), 
         pygame.image.load("assets/images/enemies/fairy2_1.png"), 
@@ -174,13 +198,13 @@ class FairyType2(EnemyType2):
         super().__init__(all_sprites, bullets, self.sprites[0], 1500)
 
     def fire_bullet(self):
-        # Cria um novo tiro e o adiciona ao grupo de sprites
+        # Cria os novos tiros e os adicionam ao grupo de sprites
         bullets = [
-            EnemyBullet1((self.rect.centerx, self.rect.top), 30),
-            EnemyBullet1((self.rect.centerx, self.rect.top), 60),
-            EnemyBullet1((self.rect.centerx, self.rect.top), 90),
-            EnemyBullet1((self.rect.centerx, self.rect.top), 120),
-            EnemyBullet1((self.rect.centerx, self.rect.top), 150),
+            EnemyBullet2((self.rect.centerx, self.rect.top + 10), 30),
+            EnemyBullet2((self.rect.centerx, self.rect.top + 10), 60),
+            EnemyBullet2((self.rect.centerx, self.rect.top + 10), 90),
+            EnemyBullet2((self.rect.centerx, self.rect.top + 10), 120),
+            EnemyBullet2((self.rect.centerx, self.rect.top + 10), 150),
         ]
 
         self.all_sprites.add(bullets)
@@ -193,6 +217,7 @@ class FairyType2(EnemyType2):
         self.update_animation(self.sprites, self.sprites_turn)
         self.move()
 
+        # Atira se conseguir
         if self.can_shoot():
             self.fire_bullet()
 
@@ -211,13 +236,33 @@ class FairyType3(EnemyType2):
         pygame.image.load("assets/images/enemies/turn3_3.png")
     ]
 
-    def __init__(self, all_sprites, bullets, shoot_cooldown):
-        super().__init__(all_sprites, bullets, self.sprites[0], shoot_cooldown)
+    def __init__(self, all_sprites, bullets):
+        super().__init__(all_sprites, bullets, self.sprites[0], 400)
+
+        self.bullet_direction = 0
+    
+    def fire_bullet(self):
+        # Calcula a direção do tiro
+        degrees = self.bullet_direction * 20
+        self.bullet_direction = (self.bullet_direction + 1) % 10
+
+        # Cria um novo tiro e o adiciona ao grupo de sprites
+        bullet = EnemyBullet3((self.rect.centerx, self.rect.top), degrees)
+
+        self.all_sprites.add(bullet)
+        self.bullets.add(bullet)
+
+        self.last_shoot_time = pygame.time.get_ticks()
     
     def update(self):
         super().update()
         self.update_animation(self.sprites, self.sprites_turn)
         self.move()
+
+        # Atira se conseguir
+        if self.can_shoot():
+            self.fire_bullet()
+
 
 class FairyType4(EnemyType1):
     sprites = [
@@ -227,13 +272,30 @@ class FairyType4(EnemyType1):
         pygame.image.load("assets/images/enemies/fairy4_3.png")
     ]
 
-    def __init__(self, all_sprites, bullets, shoot_cooldown):
-        super().__init__(all_sprites, bullets, self.sprites[0], shoot_cooldown)
+    def __init__(self, all_sprites, bullets):
+        super().__init__(all_sprites, bullets, self.sprites[0], 800)
+    
+    def fire_bullet(self):
+        # Calcula a direção do tiro
+        degrees = random.randint(0, 180)
+
+        # Cria um novo tiro e o adiciona ao grupo de sprites
+        bullet = EnemyBullet4((self.rect.centerx, self.rect.top), degrees)
+
+        self.all_sprites.add(bullet)
+        self.bullets.add(bullet)
+
+        self.last_shoot_time = pygame.time.get_ticks()
 
     def update(self):
         super().update()
         self.update_animation(self.sprites)
         self.move()
+
+        # Atira se conseguir
+        if self.can_shoot():
+            self.fire_bullet()
+
 
 class FairyType5(EnemyType1):
     sprites = [
@@ -243,11 +305,26 @@ class FairyType5(EnemyType1):
         pygame.image.load("assets/images/enemies/fairy5_3.png")
     ]
 
-    def __init__(self, all_sprites, bullets, shoot_cooldown):
-        super().__init__(all_sprites, bullets, self.sprites[0], shoot_cooldown)
+    def __init__(self, all_sprites, bullets):
+        super().__init__(all_sprites, bullets, self.sprites[0], 800)
     
+    def fire_bullet(self):
+        # Calcula a direção do tiro
+        degrees = random.randint(0, 180)
 
+        # Cria um novo tiro e o adiciona ao grupo de sprites
+        bullet = EnemyBullet5((self.rect.centerx, self.rect.top), degrees)
+
+        self.all_sprites.add(bullet)
+        self.bullets.add(bullet)
+
+        self.last_shoot_time = pygame.time.get_ticks()
+    
     def update(self):
         super().update()
         self.update_animation(self.sprites)
         self.move()
+
+        # Atira se conseguir
+        if self.can_shoot():
+            self.fire_bullet()
