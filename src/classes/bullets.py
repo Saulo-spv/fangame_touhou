@@ -41,6 +41,34 @@ class PlayerBullet(Bullet):
 
 class EnemyBullet1(Bullet):
     def __init__(self, pos, degrees):
-        image = pygame.image.load('assets/images/bullet3.png')
+        image = pygame.image.load('assets/images/enemies/bullet0.png')
+
+        super().__init__(pos, 2, degrees, image)
+
+
+class EnemyBullet2(Bullet):
+    def __init__(self, pos, degrees):
+        image = pygame.image.load('assets/images/enemies/bullet1.png')
+
+        super().__init__(pos, 2, degrees, image)
+
+
+class EnemyBullet3(Bullet):
+    def __init__(self, pos, degrees):
+        image = pygame.image.load('assets/images/enemies/bullet2.png')
+
+        super().__init__(pos, 2, degrees, image)
+
+
+class EnemyBullet4(Bullet):
+    def __init__(self, pos, degrees):
+        image = pygame.image.load('assets/images/enemies/bullet3.png')
+
+        super().__init__(pos, 2, degrees, image)
+
+
+class EnemyBullet5(Bullet):
+    def __init__(self, pos, degrees):
+        image = pygame.image.load('assets/images/enemies/bullet4.png')
 
         super().__init__(pos, 2, degrees, image)
