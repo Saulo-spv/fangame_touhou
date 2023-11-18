@@ -1,6 +1,8 @@
 import pygame
 import math
 
+from classes.game import Game
+
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos, speed, degrees, image):
         super().__init__()
@@ -9,66 +11,45 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.midbottom = (pos[0]+10, pos[1]+10)
 
-        self.max_x = pygame.display.get_surface().get_width()
-        self.max_y = pygame.display.get_surface().get_height()
+        self._speed = speed
+        self._degrees = degrees
 
-        self.speed = speed
-        self.degrees = degrees
-
-        self.dx = math.cos(math.radians(self.degrees)) * self.speed
-        self.dy = -(math.sin(math.radians(self.degrees)) * self.speed)
+        self._dx = math.cos(math.radians(self._degrees)) * self._speed
+        self._dy = -(math.sin(math.radians(self._degrees)) * self._speed)
 
     def move(self):
         # Movimenta o tiro
-        self.rect.y -= self.dy
-        self.rect.x += self.dx
+        self.rect.y -= self._dy
+        self.rect.x += self._dx
 
-    def destroy(self):
+    def screen_limit(self):
         # Remove o tiro quando atinge as bordas da tela
-        if self.rect.bottom < 0 or self.rect.top > self.max_y or self.rect.left < 0 or self.rect.right > self.max_x:
+        if self.rect.bottom < 0 or self.rect.top > Game.screen_height or self.rect.left < 0 or self.rect.right > Game.screen_width:
             self.kill()
 
     def update(self):
         self.move()
-        self.destroy()
+        self.screen_limit()
 
 
 class PlayerBullet(Bullet):
-    def __init__(self, pos, image):
+    def __init__(self, pos):
+        sprite_sheet = pygame.image.load("assets/images/player/sprite_sheet.png")
+        image = sprite_sheet.subsurface(pygame.Rect(0, 150, 16, 16)).convert_alpha()
+
         # Inicializa e posiciona o tiro
         super().__init__(pos, 5, -90, image)
 
 
-class EnemyBullet1(Bullet):
-    def __init__(self, pos, degrees):
-        image = pygame.image.load('assets/images/enemies/bullet0.png')
-
-        super().__init__(pos, 2, degrees, image)
-
-
-class EnemyBullet2(Bullet):
-    def __init__(self, pos, degrees):
-        image = pygame.image.load('assets/images/enemies/bullet1.png')
-
-        super().__init__(pos, 2, degrees, image)
-
-
-class EnemyBullet3(Bullet):
-    def __init__(self, pos, degrees):
-        image = pygame.image.load('assets/images/enemies/bullet2.png')
-
-        super().__init__(pos, 2, degrees, image)
-
-
-class EnemyBullet4(Bullet):
-    def __init__(self, pos, degrees):
-        image = pygame.image.load('assets/images/enemies/bullet3.png')
-
-        super().__init__(pos, 2, degrees, image)
-
-
-class EnemyBullet5(Bullet):
-    def __init__(self, pos, degrees):
-        image = pygame.image.load('assets/images/enemies/bullet4.png')
+class EnemyBullet(Bullet):
+    def __init__(self, pos, degrees, type):
+        if type == 1:
+            image = pygame.image.load('assets/images/enemies/bullet0.png')
+        elif type == 2:
+            image = pygame.image.load('assets/images/enemies/bullet1.png')
+        elif type == 3:
+            image = pygame.image.load('assets/images/enemies/bullet2.png')
+        elif type == 4:
+            image = pygame.image.load('assets/images/enemies/bullet2.png')
 
         super().__init__(pos, 2, degrees, image)

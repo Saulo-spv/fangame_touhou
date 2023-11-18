@@ -1,12 +1,12 @@
 import pygame
 import sys
 
-from classes.game import Game
+from classes.runner import Runner
 
 if __name__ == '__main__':
     pygame.init()
 
-    game = Game()
+    game = Runner()
     game.run()
 
     pygame.quit()
