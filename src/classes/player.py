@@ -1,8 +1,8 @@
 import pygame
 
-from classes.game import Game
 from classes.entity import Entity
 from classes.bullets import PlayerBullet
+
 
 class Player(Entity):
     def __init__(self):
@@ -19,7 +19,7 @@ class Player(Entity):
         # Configura a imagem inicial do jogador
         self.image = self._sprite_sheet.subsurface(pygame.Rect(self._sprite_sheet_x, self._sprite_sheet_y, 32, 46)).convert_alpha()
         self.rect = self.image.get_rect()
-        self.rect.center = (Game.screen_width // 2, Game.screen_height - 50)
+        self.rect.center = (400, 550)
 
         # Velocidade do jogador
         self._speed = 5
@@ -57,18 +57,11 @@ class Player(Entity):
             self.rect.y -= self._speed
         else:
             self._current_line = 0
-    
-    def shoot(self):
-        keys = pygame.key.get_pressed()
-
-        # Dispara o tiro se a tecla de espaço for pressionada e o cooldown permitir
-        if keys[pygame.K_SPACE] and self.can_shoot():
-            self.fire_bullet()
 
     def screen_limit(self):
         # Garante que o jogador não ultrapasse as bordas da tela
-        self.rect.x = max(-10, min(self.rect.x, Game.screen_width - 60))
-        self.rect.y = max(-5, min(self.rect.y, Game.screen_height - 60))
+        self.rect.x = max(-10, min(self.rect.x, 740))
+        self.rect.y = max(-5, min(self.rect.y, 540))
 
     def recharge(self):
         # Cria um novo tiro e o adiciona ao grupo de sprites

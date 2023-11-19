@@ -1,7 +1,6 @@
 import pygame
 import math
 
-from classes.game import Game
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos, speed, degrees, image):
@@ -24,7 +23,7 @@ class Bullet(pygame.sprite.Sprite):
 
     def screen_limit(self):
         # Remove o tiro quando atinge as bordas da tela
-        if self.rect.bottom < 0 or self.rect.top > Game.screen_height or self.rect.left < 0 or self.rect.right > Game.screen_width:
+        if self.rect.bottom < 0 or self.rect.top > 600 or self.rect.left < 0 or self.rect.right > 800:
             self.kill()
 
     def update(self):

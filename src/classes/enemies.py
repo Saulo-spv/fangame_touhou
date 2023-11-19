@@ -1,9 +1,7 @@
 import pygame
 import random
-
 from abc import ABC, abstractmethod
 
-from classes.game import Game
 from classes.bullets import *
 from classes.entity import Entity
 
@@ -26,12 +24,8 @@ class Enemy(Entity, ABC):
     def recharge(self):
         pass
 
-    def shoot(self):
-        if self.can_shoot():
-            self.fire_bullet()
-
     def screen_limit(self):
-        if self.rect.top >= Game.screen_height:
+        if self.rect.top >= 600:
             self.kill()
 
 
@@ -48,7 +42,7 @@ class BigFairy(Enemy, ABC):
 
         self.rect = self.image.get_rect()
         self.rect.bottom = 0
-        self.rect.x = random.randint(20, Game.screen_width - 20)
+        self.rect.x = random.randint(20, 780)
 
         # Configurações de velocidade
         self._x_speed = random.uniform(-2, 2)
@@ -96,7 +90,7 @@ class BigFairy(Enemy, ABC):
             self.rect.x += self._x_speed
             self.rect.y += self._y_speed
 
-            if self.rect.left <= 0 or self.rect.right >= Game.screen_width:
+            if self.rect.left <= 0 or self.rect.right >= 800:
                 self._x_speed *= -1
     
     @abstractmethod
@@ -132,7 +126,7 @@ class SmallFairy(Enemy):
         
         self.rect = self.image.get_rect()
         self.rect.bottom = 0
-        self.rect.x = random.randint(20, Game.screen_width - 20)
+        self.rect.x = random.randint(20, 780)
         
         # Configurações de velocidade
         self._x_speed = random.uniform(-0.8, 0.8)
