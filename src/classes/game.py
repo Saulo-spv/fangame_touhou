@@ -3,7 +3,7 @@ import pygame
 from classes.player import Player
 from classes.background import Background
 from classes.enemies import *
-
+from classes.spawner import Spawn
 
 class Game:
     def __init__(self):
@@ -18,13 +18,7 @@ class Game:
         self.player = Player()
 
         self.all_enemies = pygame.sprite.Group()
-        self.all_enemies.add([
-            BigFairyType1(),
-            BigFairyType2(),
-            BigFairyType3(),
-            SmallFairy(1),
-            SmallFairy(2)
-        ])
+        self.spawn_manager = Spawn(self.all_enemies)
 
         self.all_bullets = pygame.sprite.Group()
 
@@ -49,6 +43,9 @@ class Game:
             self.all_sprites = pygame.sprite.Group()
             self.all_sprites.add(self.background, self.player, self.all_enemies, self.all_bullets)
 
+            # Surgimento dos inimigos
+            self.spawn_manager.spawn()
+
             # Atualiza os sprites
             self.all_sprites.update()
 
@@ -57,4 +54,4 @@ class Game:
 
             # Atualiza a tela
             pygame.display.flip()
-            self.clock.tick(30)
+            self.clock.tick(50)
