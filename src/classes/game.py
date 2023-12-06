@@ -30,6 +30,9 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
 
+            # Surgimento dos inimigos
+            self.spawn_manager.spawn()
+
             for enemy in self.all_enemies:
                 if enemy.can_shoot():
                     bullets = enemy.spawn_bullets()
@@ -42,9 +45,6 @@ class Game:
             
             self.all_sprites = pygame.sprite.Group()
             self.all_sprites.add(self.background, self.player, self.all_enemies, self.all_bullets)
-
-            # Surgimento dos inimigos
-            self.spawn_manager.spawn()
 
             # Atualiza os sprites
             self.all_sprites.update()
