@@ -1,12 +1,12 @@
 import pygame
 
 from classes.entity import Entity
-from classes.bullets import PlayerBullet
+from classes.bullets import Bullet
 
 
 class Player(Entity):
     def __init__(self):
-        super().__init__(200)
+        super().__init__(3, 150)
 
         # Configurações dos sprites
         self._sprite_sheet_x = 0
@@ -65,7 +65,7 @@ class Player(Entity):
 
     def recharge(self):
         # Cria um novo tiro e o adiciona ao grupo de sprites
-        bullet = PlayerBullet((self.rect.centerx, self.rect.top))
+        bullet = Bullet((self.rect.centerx, self.rect.top), 10, -90, 'player')
         
         return bullet
 
@@ -79,3 +79,6 @@ class Player(Entity):
         self.image = self._sprite_sheet.subsurface(pygame.Rect(self._sprite_sheet_x, self._sprite_sheet_y, 32, 46)).convert_alpha()
 
         self.image = pygame.transform.scale(self.image, (60, 60))
+    
+    def update_hitbox(self):
+        self.hitbox = (self.rect.centerx + 8, self.rect.centery + 5, 10, 10)
