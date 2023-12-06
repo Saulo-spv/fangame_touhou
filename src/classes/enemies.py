@@ -7,8 +7,8 @@ from classes.entity import Entity
 
 
 class Enemy(Entity, ABC):
-    def __init__(self, shoot_cooldown):
-        super().__init__(shoot_cooldown)
+    def __init__(self, life, shoot_cooldown):
+        super().__init__(life, shoot_cooldown)
 
         self._shoot_cooldown = shoot_cooldown
 
@@ -21,6 +21,10 @@ class Enemy(Entity, ABC):
         pass
 
     @abstractmethod
+    def update_hitbox(self):
+        pass
+
+    @abstractmethod
     def recharge(self):
         pass
 
@@ -29,11 +33,14 @@ class Enemy(Entity, ABC):
             self.kill()
 
 
-class BigFairy(Enemy, ABC):
-    def __init__(self, default_image, shoot_cooldown):
-        super().__init__(shoot_cooldown)
+class BigFairy(Enemy):
+    def __init__(self, enemy_type):
+        self.type = enemy_type
 
-        self.image = default_image
+        self._sprites = [pygame.image.load(f"assets/images/enemies/fairy{self.type}_{i}.png") for i in range(4)]
+        self._sprites_turn = [pygame.image.load(f"assets/images/enemies/turn{self.type}_{i}.png") for i in range(4)]
+
+        self.image = self._sprites[0]
 
         # Configurações de animação
         self._animation_count = 0
@@ -48,6 +55,15 @@ class BigFairy(Enemy, ABC):
         self._x_speed = random.uniform(-2, 2)
         self._y_speed = random.uniform(1.7, 1.8)
         self._stay_y = random.randint(100, 300)
+
+        self._bullet_direction = 0
+
+        if self.type == 3:
+            shoot_cooldown = 400
+        else:
+            shoot_cooldown = 1500
+
+        super().__init__(10, shoot_cooldown)
 
     def update_animation(self):
         current_time = pygame.time.get_ticks()
@@ -93,29 +109,41 @@ class BigFairy(Enemy, ABC):
             if self.rect.left <= 0 or self.rect.right >= 800:
                 self._x_speed *= -1
     
-    @abstractmethod
+    def update_hitbox(self):
+        self.hitbox = (self.rect.x, self.rect.y, 50, 50)
+    
     def recharge(self):
-        pass
+        if self.type == 1:
+            bullets = [
+                Bullet((self.rect.centerx, self.rect.centery), 2, 0, 'enemy_1'),
+                Bullet((self.rect.centerx, self.rect.centery), 2, 90, 'enemy_1'),
+                Bullet((self.rect.centerx, self.rect.centery), 2, 180, 'enemy_1'),
+                Bullet((self.rect.centerx, self.rect.centery), 2, 270, 'enemy_1'),
+            ]
+        elif self.type == 2:
+            bullets = [
+                Bullet((self.rect.centerx, self.rect.top + 10), 2, 30, 'enemy_2'),
+                Bullet((self.rect.centerx, self.rect.top + 10), 2, 60, 'enemy_2'),
+                Bullet((self.rect.centerx, self.rect.top + 10), 2, 90, 'enemy_2'),
+                Bullet((self.rect.centerx, self.rect.top + 10), 2, 120, 'enemy_2'),
+                Bullet((self.rect.centerx, self.rect.top + 10), 2, 150, 'enemy_2'),
+            ]
+        elif self.type == 3:
+            degrees = self._bullet_direction * 20
+            self._bullet_direction = (self._bullet_direction + 1) % 10
+
+            bullets = Bullet((self.rect.centerx, self.rect.top), 2, degrees, 'enemy_3')
+
+        return bullets
 
 
 class SmallFairy(Enemy):
     def __init__(self, enemy_type):
-        super().__init__(800)
+        super().__init__(4, 800)
 
-        if enemy_type == 1:
-            self._sprites = [
-                pygame.image.load("assets/images/enemies/fairy4_0.png"), 
-                pygame.image.load("assets/images/enemies/fairy4_1.png"), 
-                pygame.image.load("assets/images/enemies/fairy4_2.png"), 
-                pygame.image.load("assets/images/enemies/fairy4_3.png")
-            ]
-        elif enemy_type == 2:
-            self._sprites = [
-                pygame.image.load("assets/images/enemies/fairy5_0.png"), 
-                pygame.image.load("assets/images/enemies/fairy5_1.png"), 
-                pygame.image.load("assets/images/enemies/fairy5_2.png"), 
-                pygame.image.load("assets/images/enemies/fairy5_3.png")
-            ]
+        self.type = enemy_type
+
+        self._sprites = [pygame.image.load(f"assets/images/enemies/fairy{self.type + 3}_{i}.png") for i in range(4)]
 
         self.image = self._sprites[0]
 
@@ -152,101 +180,12 @@ class SmallFairy(Enemy):
         if self.rect.left <= 0 or self.rect.right >= 800:
             self._x_speed *= -1
     
+    def update_hitbox(self):
+        self.hitbox = (self.rect.x, self.rect.y, 30, 30)
+    
     def recharge(self):
         degrees = random.randint(0, 180)
 
-        # Cria um novo tiro e o adiciona ao grupo de sprites
-        bullet = EnemyBullet((self.rect.centerx, self.rect.top), degrees, type=4)
-
-        return bullet
-
-
-class BigFairyType1(BigFairy):    
-    def __init__(self):
-        self._sprites = [
-            pygame.image.load("assets/images/enemies/fairy1_0.png"), 
-            pygame.image.load("assets/images/enemies/fairy1_1.png"), 
-            pygame.image.load("assets/images/enemies/fairy1_2.png"), 
-            pygame.image.load("assets/images/enemies/fairy1_3.png")
-        ]
-
-        self._sprites_turn =  [
-            pygame.image.load("assets/images/enemies/turn1_0.png"), 
-            pygame.image.load("assets/images/enemies/turn1_1.png"), 
-            pygame.image.load("assets/images/enemies/turn1_2.png"), 
-            pygame.image.load("assets/images/enemies/turn1_3.png")
-        ]
-
-        super().__init__(self._sprites[0], 1500)
-    
-    def recharge(self):
-        # Cria os novos tiros e os adicionam ao grupo de sprites
-        bullets = [
-            EnemyBullet((self.rect.centerx, self.rect.centery), 0, type=1),
-            EnemyBullet((self.rect.centerx, self.rect.centery), 90, type=1),
-            EnemyBullet((self.rect.centerx, self.rect.centery), 180, type=1),
-            EnemyBullet((self.rect.centerx, self.rect.centery), 270, type=1),
-        ]
-
-        return bullets
-
-
-class BigFairyType2(BigFairy):
-    def __init__(self):
-        self._sprites = [
-            pygame.image.load("assets/images/enemies/fairy2_0.png"), 
-            pygame.image.load("assets/images/enemies/fairy2_1.png"), 
-            pygame.image.load("assets/images/enemies/fairy2_2.png"), 
-            pygame.image.load("assets/images/enemies/fairy2_3.png")
-        ]
-
-        self._sprites_turn =  [
-            pygame.image.load("assets/images/enemies/turn2_0.png"), 
-            pygame.image.load("assets/images/enemies/turn2_1.png"), 
-            pygame.image.load("assets/images/enemies/turn2_2.png"), 
-            pygame.image.load("assets/images/enemies/turn2_3.png")
-        ]
-
-        super().__init__(self._sprites[0], 1500)
-    
-    def recharge(self):
-        # Cria os novos tiros e os adicionam ao grupo de sprites
-        bullets = [
-            EnemyBullet((self.rect.centerx, self.rect.top + 10), 30, type=2),
-            EnemyBullet((self.rect.centerx, self.rect.top + 10), 60, type=2),
-            EnemyBullet((self.rect.centerx, self.rect.top + 10), 90, type=2),
-            EnemyBullet((self.rect.centerx, self.rect.top + 10), 120, type=2),
-            EnemyBullet((self.rect.centerx, self.rect.top + 10), 150, type=2),
-        ]
-
-        return bullets
-    
-
-class BigFairyType3(BigFairy):
-    def __init__(self):
-        self._sprites = [
-            pygame.image.load("assets/images/enemies/fairy3_0.png"), 
-            pygame.image.load("assets/images/enemies/fairy3_1.png"), 
-            pygame.image.load("assets/images/enemies/fairy3_2.png"), 
-            pygame.image.load("assets/images/enemies/fairy3_3.png")
-        ]
-
-        self._sprites_turn =  [
-            pygame.image.load("assets/images/enemies/turn3_0.png"), 
-            pygame.image.load("assets/images/enemies/turn3_1.png"), 
-            pygame.image.load("assets/images/enemies/turn3_2.png"), 
-            pygame.image.load("assets/images/enemies/turn3_3.png")
-        ]
-
-        super().__init__(self._sprites[0], 400)
-
-        self._bullet_direction = 0
-    
-    def recharge(self):
-        degrees = self._bullet_direction * 20
-        self._bullet_direction = (self._bullet_direction + 1) % 10
-
-        # Cria um novo tiro e o adiciona ao grupo de sprites
-        bullet = EnemyBullet((self.rect.centerx, self.rect.top), degrees, type=3)
+        bullet = Bullet((self.rect.centerx, self.rect.top), 2, degrees, 'enemy_4')
 
         return bullet
