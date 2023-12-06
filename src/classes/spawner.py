@@ -3,66 +3,71 @@ import random
 from classes.enemies import*
 
 class Spawn:
+
+    INTERVAL_1 = 15000
+    INTERVAL_2 = 30000
+    INTERVAL_3 = 45000
+    INTERVAL_4 = 80000
+
     def __init__ (self, all_enemies):
+        # pygame.group dos inimigos
         self.all_enemies = all_enemies
-        self._last_spawn_time = 0
+
+        # Variáveis de controle
+        self.types = [SmallFairy, BigFairyType1, BigFairyType2, BigFairyType3]
+        self.max_quantity = [4,1,0,0]
         self.small_type = 1
 
-        # Quantidade máxima de inimigos
-        self.max_small_type = 4
-        self.max_big_type1 = 1
-        self.max_big_type2 = 0
-        self.max_big_type3 = 0
+        # Tempo do último spwan
+        self._last_spawn_time = 0
 
+        # Delay no surgimento
+        self.cooldown = 3500
 
     def spawn(self):
         current_time = pygame.time.get_ticks()
 
-        if current_time > 10000 and current_time < 10100:
-            self.max_small_type = 5
-            self.max_big_type1 = 2
-            self.max_big_type2 = 1
-        elif current_time > 20000 and current_time < 20100:
-            self.max_small_type = 6
-            self.max_big_type1 = 2
-            self.max_big_type2 = 1
-        elif current_time > 30000 and current_time < 30100:
-            self.max_small_type = 18
-            self.max_big_type1 = 0
-            self.max_big_type2 = 2
-            self.max_big_type3 = 3
+        # Alteração das variáveis de controle conforme o tempo
+        if self.INTERVAL_1 < current_time < self.INTERVAL_1 + 100:
+            self.max_quantity = [5,2,0,0]
+            self.cooldown = 2000
+
+        elif self.INTERVAL_2 < current_time < self.INTERVAL_2 + 100:
+            self.max_quantity = [6,2,1,0]
+            self.cooldown = 1200
+
+        elif self.INTERVAL_3 < current_time < self.INTERVAL_3 + 100:
+            self.max_quantity = [9,0,2,3]
             self.small_type = 2
+            self.cooldown = 900
+
+        elif self.INTERVAL_4 < current_time < self.INTERVAL_4 + 100:
+            self.max_quantity = [16,5,3,0]
+            self.small_type = 1
+            self.cooldown = 500
 
         self.mob_spawner()
-
+        
     def mob_spawner(self):
-        big_type1_count = sum(isinstance(sprite, BigFairyType1) for sprite in self.all_enemies.sprites())
-        big_type2_count = sum(isinstance(sprite, BigFairyType2) for sprite in self.all_enemies.sprites())
-        big_type3_count = sum(isinstance(sprite, BigFairyType3) for sprite in self.all_enemies.sprites())
-        small_type_count = sum(isinstance(sprite, SmallFairy) for sprite in self.all_enemies.sprites())
-        self.mob_spawner_aux(big_type1_count, big_type2_count, big_type3_count, small_type_count)
+        quantities = []
 
-    def mob_spawner_aux(self, big_type1_count, big_type2_count, big_type3_count, small_type_count):
-            if small_type_count < self.max_small_type:
-                current_time = pygame.time.get_ticks()
-                if current_time - self._last_spawn_time > random.randint(900,1200):
-                    self._last_spawn_time = current_time
-                    self.all_enemies.add(SmallFairy(self.small_type))
+        # Registro da quantidade de inimigos vigentes
+        for fairy_type in self.types:
+            count = sum(isinstance(sprite, fairy_type) for sprite in self.all_enemies.sprites())
+            quantities.append(count)
 
-            if big_type1_count < self.max_big_type1:
-                current_time = pygame.time.get_ticks()
-                if current_time - self._last_spawn_time > random.randint(1300, 1600):
-                    self._last_spawn_time = current_time
-                    self.all_enemies.add(BigFairyType1())
+        self.mob_spawner_aux(quantities)
 
-            if big_type2_count < self.max_big_type2:
+    def mob_spawner_aux(self, quantities):
+        current_time = pygame.time.get_ticks()
+        
+        # Adiciona novos inimigos
+        for i in range(4):
+            if quantities[i] < self.max_quantity[i]:
                 current_time = pygame.time.get_ticks()
-                if current_time - self._last_spawn_time > random.randint(1300, 1600):
+                if current_time - self._last_spawn_time > self.cooldown:
                     self._last_spawn_time = current_time
-                    self.all_enemies.add(BigFairyType2())
-
-            if big_type3_count < self.max_big_type3:
-                current_time = pygame.time.get_ticks()
-                if current_time - self._last_spawn_time > random.randint(1000, 1200):
-                    self._last_spawn_time = current_time
-                    self.all_enemies.add(BigFairyType3())
+                    if i == 0:
+                        self.all_enemies.add(self.types[i](self.small_type))
+                    else:
+                        self.all_enemies.add(self.types[i]())
