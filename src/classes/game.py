@@ -116,9 +116,8 @@ class Game:
             if self.player.life <= 0:
                 running = False
                 self.update_highscore()
-
+            
             pygame.display.flip()
-            self.clock.tick(30)
 
     # Atualiza o Jogo
     def update_game(self):
@@ -147,6 +146,8 @@ class Game:
 
         self.update_interface()
 
+        self.clock.tick(50)
+
     def paused_screen(self):
         # Atualiza os Botões
         self.botao_continue.update()
@@ -160,7 +161,3 @@ class Game:
             elif self.botao_quit.rect.collidepoint(mouse_pos):
                 pygame.quit()
                 quit()
-
-            # Atualiza a tela
-            pygame.display.flip()
-            self.clock.tick(50)

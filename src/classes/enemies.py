@@ -10,8 +10,6 @@ class Enemy(Entity, ABC):
     def __init__(self, life, shoot_cooldown):
         super().__init__(life, shoot_cooldown)
 
-        self._shoot_cooldown = shoot_cooldown
-
     @abstractmethod
     def move(self):
         pass
