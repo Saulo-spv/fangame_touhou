@@ -1,14 +1,16 @@
 import pygame
 
-from classes.menu import Menu
 from classes.player import Player
 from classes.background import Background
 from classes.enemies import *
+from classes.button import Button
 from classes.spawner import Spawn
+
 
 class Game:
     def __init__(self):
         self.screen = pygame.display.set_mode((800, 600))
+        pygame.display.set_caption("Touhou")
         self.clock = pygame.time.Clock()
 
         self.background = Background((800, 600), -7768, 1, 'assets/images/background/starfield.png')
@@ -35,7 +37,10 @@ class Game:
             self.__highscore = 0
 
         self.__score = 0
-        self.__highscore
+        
+        self.paused = False
+        self.botao_continue = Button(300, 200, 200, 50, "Continue", font_size=30)
+        self.botao_quit = Button(300, 300, 200, 50, "Quit", font_size=30)
     
     @property
     def score(self):
@@ -88,7 +93,7 @@ class Game:
             data = open('highscore.txt', 'w')
             data.write(str(self.highscore))
             data.close()
-        
+    
     def run(self):
         # Loop principal do jogo
         running = True
@@ -96,38 +101,65 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.paused = not self.paused
 
-            # Surgimento dos inimigos
-            self.spawn_manager.spawn()
-
-            for enemy in self.all_enemies:
-                if enemy.can_shoot():
-                    bullets = enemy.spawn_bullets()
-                    self.enemy_bullets.add(bullets)
+            if not self.paused:
+                self.update_game()
+            else:
+                # Atualiza a Tela de Pause e Desenha os Botões
+                self.paused_screen()
+                self.botao_continue.draw(self.screen)
+                self.botao_quit.draw(self.screen)
             
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_SPACE] and self.player.can_shoot():
-                bullets = self.player.spawn_bullets()
-                self.player_bullets.add(bullets)
-            
-            self.all_sprites = pygame.sprite.Group()
-            self.all_sprites.add(self.background, self.player, self.all_enemies, self.player_bullets, self.enemy_bullets)
-
-            # Atualiza os sprites
-            self.all_sprites.update()
-
-            # Desenha os sprites na tela
-            self.all_sprites.draw(self.screen)
-
-            self.handle_collision()
-
-            self.update_score()
-
-            self.update_interface()
-
             if self.player.life <= 0:
                 running = False
                 self.update_highscore()
+
+            pygame.display.flip()
+            self.clock.tick(30)
+
+    # Atualiza o Jogo
+    def update_game(self):
+        # Surgimento dos inimigos
+        self.spawn_manager.spawn()
+        
+        for enemy in self.all_enemies:
+            if enemy.can_shoot():
+                bullets = enemy.spawn_bullets()
+                self.all_bullets.add(bullets)
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] and self.player.can_shoot():
+            bullets = self.player.spawn_bullets()
+            self.all_bullets.add(bullets)
+
+        self.all_sprites = pygame.sprite.Group()
+        self.all_sprites.add(self.background, self.player, self.all_enemies, self.all_bullets)
+
+        self.all_sprites.update()
+        self.all_sprites.draw(self.screen)
+        
+        self.handle_collision()
+
+        self.update_score()
+
+        self.update_interface()
+
+    def paused_screen(self):
+        # Atualiza os Botões
+        self.botao_continue.update()
+        self.botao_quit.update()
+
+        # Verifica Eventos
+        if pygame.mouse.get_pressed()[0]:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.botao_continue.rect.collidepoint(mouse_pos):
+                self.paused = False
+            elif self.botao_quit.rect.collidepoint(mouse_pos):
+                pygame.quit()
+                quit()
 
             # Atualiza a tela
             pygame.display.flip()
