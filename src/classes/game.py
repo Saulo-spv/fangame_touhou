@@ -128,15 +128,15 @@ class Game:
         for enemy in self.all_enemies:
             if enemy.can_shoot():
                 bullets = enemy.spawn_bullets()
-                self.all_bullets.add(bullets)
+                self.enemy_bullets.add(bullets)
 
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and self.player.can_shoot():
+        if keys[pygame.K_j] and self.player.can_shoot():
             bullets = self.player.spawn_bullets()
-            self.all_bullets.add(bullets)
+            self.player_bullets.add(bullets)
 
         self.all_sprites = pygame.sprite.Group()
-        self.all_sprites.add(self.background, self.player, self.all_enemies, self.all_bullets)
+        self.all_sprites.add(self.background, self.player, self.all_enemies, self.enemy_bullets, self.player_bullets)
 
         self.all_sprites.update()
         self.all_sprites.draw(self.screen)

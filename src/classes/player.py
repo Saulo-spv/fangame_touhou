@@ -27,32 +27,32 @@ class Player(Entity):
     def move(self):
         # Configura a movimentação
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP] and keys[pygame.K_LEFT]:
+        if keys[pygame.K_w] and keys[pygame.K_a]:
             self._current_line = 1
             self.rect.y -= self._speed / 3**0.5
             self.rect.x -= self._speed / 3**0.5
-        elif keys[pygame.K_UP] and keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_w] and keys[pygame.K_d]:
             self._current_line = 2
             self.rect.y -= self._speed / 3**0.5
             self.rect.x += self._speed / 3**0.5
-        elif keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_s] and keys[pygame.K_d]:
             self._current_line = 2
             self.rect.y += self._speed / 3**0.5
             self.rect.x += self._speed / 3**0.5
-        elif keys[pygame.K_DOWN] and keys[pygame.K_LEFT]:
+        elif keys[pygame.K_s] and keys[pygame.K_a]:
             self._current_line = 1
             self.rect.y += self._speed / 3**0.5
             self.rect.x -= self._speed / 3**0.5
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_a]:
             self._current_line = 1
             self.rect.x -= self._speed
-        elif keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_d]:
             self._current_line = 2
             self.rect.x += self._speed
-        elif keys[pygame.K_DOWN]:
+        elif keys[pygame.K_s]:
             self._current_line = 0
             self.rect.y += self._speed
-        elif keys[pygame.K_UP]:
+        elif keys[pygame.K_w]:
             self._current_line = 0
             self.rect.y -= self._speed
         else:
