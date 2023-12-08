@@ -12,6 +12,8 @@ class Game:
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption("Touhou")
         self.clock = pygame.time.Clock()
+        self.current_time = 0
+        self.last_time_pause = 0
 
         self.background = Background((800, 600), -7768, 1, 'assets/images/background/starfield.png')
 
@@ -98,14 +100,18 @@ class Game:
         # Loop principal do jogo
         running = True
         while running:
+            current_ticks = pygame.time.get_ticks()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.paused = not self.paused
+                        self.last_time_pause = pygame.time.get_ticks()
 
             if not self.paused:
+                self.current_time += current_ticks - self.last_time_pause
+                self.last_time_pause = current_ticks
                 self.update_game()
             else:
                 # Atualiza a Tela de Pause e Desenha os Botões
@@ -122,6 +128,7 @@ class Game:
     # Atualiza o Jogo
     def update_game(self):
         # Surgimento dos inimigos
+        self.spawn_manager.current_time = self.current_time
         self.spawn_manager.spawn()
         
         for enemy in self.all_enemies:

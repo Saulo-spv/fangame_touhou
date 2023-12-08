@@ -16,6 +16,7 @@ class Spawn:
         # Variáveis de controle
         self.types = {SmallFairy:2, BigFairy:3}
         self.max_quantity = {SmallFairy:[2,0], BigFairy:[0,0,0]}
+        self.current_time = 0
 
         # Tempo do último spwan
         self._last_spawn_time = {SmallFairy:[0,0], BigFairy:[0,0,0]}
@@ -24,22 +25,20 @@ class Spawn:
         self.cooldown = 2500
 
     def spawn(self):
-        current_time = pygame.time.get_ticks()
-
         # Alteração das variáveis de controle conforme o tempo
-        if self.INTERVAL_1 < current_time < self.INTERVAL_1 + 100:
+        if self.INTERVAL_1 < self.current_time < self.INTERVAL_1 + 100:
             self.max_quantity = {SmallFairy:[3,0], BigFairy:[1,0,0]}
             self.cooldown = 2000
 
-        elif self.INTERVAL_2 < current_time < self.INTERVAL_2 + 100:
+        elif self.INTERVAL_2 < self.current_time < self.INTERVAL_2 + 100:
             self.max_quantity = {SmallFairy:[3,0], BigFairy:[1,1,0]}
             self.cooldown = 1200
 
-        elif self.INTERVAL_3 < current_time < self.INTERVAL_3 + 100:
+        elif self.INTERVAL_3 < self.current_time < self.INTERVAL_3 + 100:
             self.max_quantity = {SmallFairy:[5,1], BigFairy:[2,1,0]}
             self.cooldown = 900
 
-        elif self.INTERVAL_4 < current_time < self.INTERVAL_4 + 100:
+        elif self.INTERVAL_4 < self.current_time < self.INTERVAL_4 + 100:
             self.max_quantity = {SmallFairy:[2,6], BigFairy:[0,2,3]}
             self.cooldown = 500
 
