@@ -41,6 +41,7 @@ class Game:
         self.paused = False
         self.botao_continue = Button(300, 200, 200, 50, "Continue", font_size=30)
         self.botao_quit = Button(300, 300, 200, 50, "Quit", font_size=30)
+        self.botao_again = Button(300, 200, 200, 50, "Again", font_size=30)
     
     @property
     def score(self):
@@ -105,17 +106,18 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         self.paused = not self.paused
 
-            if not self.paused:
+            if self.player.life <= 0:
+                self.game_over()
+                self.botao_again.draw(self.screen)
+                self.botao_quit.draw(self.screen)
+                self.update_highscore()
+            elif not self.paused:
                 self.update_game()
             else:
                 # Atualiza a Tela de Pause e Desenha os Botões
                 self.paused_screen()
                 self.botao_continue.draw(self.screen)
                 self.botao_quit.draw(self.screen)
-            
-            if self.player.life <= 0:
-                running = False
-                self.update_highscore()
             
             pygame.display.flip()
 
@@ -161,3 +163,48 @@ class Game:
             elif self.botao_quit.rect.collidepoint(mouse_pos):
                 pygame.quit()
                 quit()
+
+    def game_over(self):
+
+        # Escreve Game Over
+        game_over_text = self.font.render("Game Over", True, (255, 0, 0))
+        text_rect = game_over_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 5))
+        self.screen.blit(game_over_text, text_rect)
+
+        # Atualiza os Botões
+        self.botao_again.update()
+        self.botao_quit.update()
+
+        # Verifica Eventos
+        mouse_pressed = pygame.mouse.get_pressed()[0]
+        if mouse_pressed:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.botao_again.rect.collidepoint(mouse_pos):
+                self.reset_game() 
+            elif self.botao_quit.rect.collidepoint(mouse_pos):
+                pygame.quit()
+                quit()
+
+            # Atualiza a tela
+            pygame.display.flip()
+            self.clock.tick(50)
+
+
+    def reset_game(self):
+        # Reinicia a pontuação
+        self.score = 0
+
+        # Reposiciona o jogador no lugar de início
+        self.player.rect.x = 400
+        self.player.rect.y = 550
+
+        # Reinicia a vida do jogador
+        self.player.life = 3
+
+        # Limpa os grupos de sprites
+        self.all_enemies.empty()
+        self.player_bullets.empty()
+        self.enemy_bullets.empty()
+
+        # Volta para o loop principal do jogo
+        self.run()
