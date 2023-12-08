@@ -120,6 +120,7 @@ class Game:
                 # Atualiza a Tela de Pause e Desenha os Botões
                 self.paused_screen()
                 self.botao_continue.draw(self.screen)
+                self.botao_menu.draw(self.screen)
                 self.botao_quit.draw(self.screen)
             
             pygame.display.flip()
@@ -157,6 +158,7 @@ class Game:
         # Atualiza os Botões
         self.botao_continue.update()
         self.botao_quit.update()
+        self.botao_menu.update()
 
         # Verifica Eventos
         if pygame.mouse.get_pressed()[0]:
@@ -166,6 +168,10 @@ class Game:
             elif self.botao_quit.rect.collidepoint(mouse_pos):
                 pygame.quit()
                 quit()
+            elif self.botao_menu.rect.collidepoint(mouse_pos):
+                    menu = Menu()
+                    menu.run_menu()
+                    self.reset_game()   
 
     def game_over(self):
 
