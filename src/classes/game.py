@@ -5,6 +5,7 @@ from classes.background import Background
 from classes.enemies import *
 from classes.button import Button
 from classes.spawner import Spawn
+from classes.menu import Menu
 
 
 class Game:
@@ -42,6 +43,7 @@ class Game:
         self.botao_continue = Button(300, 200, 200, 50, "Continue", font_size=30)
         self.botao_quit = Button(300, 300, 200, 50, "Quit", font_size=30)
         self.botao_again = Button(300, 200, 200, 50, "Again", font_size=30)
+        self.botao_menu = Button(300, 400, 200, 50, "Return to Menu", font_size=30)
     
     @property
     def score(self):
@@ -110,6 +112,7 @@ class Game:
                 self.game_over()
                 self.botao_again.draw(self.screen)
                 self.botao_quit.draw(self.screen)
+                self.botao_menu.draw(self.screen)
                 self.update_highscore()
             elif not self.paused:
                 self.update_game()
@@ -174,21 +177,25 @@ class Game:
         # Atualiza os Botões
         self.botao_again.update()
         self.botao_quit.update()
+        self.botao_menu.update()
 
         # Verifica Eventos
         mouse_pressed = pygame.mouse.get_pressed()[0]
         if mouse_pressed:
             mouse_pos = pygame.mouse.get_pos()
             if self.botao_again.rect.collidepoint(mouse_pos):
-                self.reset_game() 
+                self.reset_game()
             elif self.botao_quit.rect.collidepoint(mouse_pos):
                 pygame.quit()
                 quit()
+            elif self.botao_menu.rect.collidepoint(mouse_pos):
+                    menu = Menu()
+                    menu.run_menu()
+                    self.reset_game()
 
             # Atualiza a tela
             pygame.display.flip()
             self.clock.tick(50)
-
 
     def reset_game(self):
         # Reinicia a pontuação
