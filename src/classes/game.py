@@ -5,6 +5,7 @@ from classes.background import Background
 from classes.enemies import *
 from classes.button import Button
 from classes.spawner import Spawn
+from classes.music_player import Music
 
 
 class Game:
@@ -21,6 +22,8 @@ class Game:
         self.life_heart = pygame.transform.scale(self.life_heart, (30, 30))
 
         self.font = pygame.font.Font('assets/fonts/Silkscreen-Regular.ttf', 20)
+
+        self.music_player = Music()
 
         self.player = Player()
 
@@ -101,6 +104,10 @@ class Game:
         running = True
         while running:
             current_ticks = pygame.time.get_ticks()
+
+            self.music_player.play_music()
+            self.music_player.current_ticks = current_ticks
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -108,6 +115,7 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         self.paused = not self.paused
                         self.last_time_pause = pygame.time.get_ticks()
+                        self.music_player.pause_music()
 
             if not self.paused:
                 self.current_time += current_ticks - self.last_time_pause
@@ -118,6 +126,8 @@ class Game:
                 self.paused_screen()
                 self.botao_continue.draw(self.screen)
                 self.botao_quit.draw(self.screen)
+
+                self.music_player.music_select()
             
             if self.player.life <= 0:
                 running = False
