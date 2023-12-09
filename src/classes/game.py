@@ -124,10 +124,12 @@ class Game:
                 self.botao_again.draw(self.screen)
                 self.botao_quit.draw(self.screen)
                 self.botao_menu.draw(self.screen)
+                
                 self.update_highscore()
             elif not self.paused:
                 self.current_time += current_ticks - self.last_time_pause
                 self.last_time_pause = current_ticks
+                
                 self.update_game()
             else:
                 # Atualiza a Tela de Pause e Desenha os Botões
@@ -185,10 +187,10 @@ class Game:
             elif self.botao_quit.rect.collidepoint(mouse_pos):
                 pygame.quit()
                 quit()
-            elif self.botao_menu.rect.collidepoint(mouse_pos): 
-                    menu = Menu()
-                    menu.run_menu()
-                    self.reset_game()
+            elif self.botao_menu.rect.collidepoint(mouse_pos):
+                menu = Menu()
+                menu.run_menu()
+                self.reset_game()
 
     def game_over(self):
         pygame.mixer.music.stop()
