@@ -1,18 +1,16 @@
 import pygame
 import sys
+
+sys.path.append('./src')
+
 from classes.game import Game
-from classes.menu import Menu
+
 
 if __name__ == '__main__':
     pygame.init()
     pygame.mixer.init()
 
-    menu = Menu()
-    menu.run_menu()
-
-
-    game = Game()
-    game.run()
+    Game().main_menu()
 
     pygame.mixer.quit()
     pygame.quit()

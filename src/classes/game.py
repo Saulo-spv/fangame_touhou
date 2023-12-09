@@ -1,11 +1,11 @@
 import pygame
+import sys
 
 from classes.player import Player
 from classes.background import Background
 from classes.enemies import *
 from classes.button import Button
 from classes.spawner import Spawn
-from classes.menu import Menu
 from classes.music_player import Music
 
 
@@ -13,16 +13,10 @@ class Game:
     def __init__(self):
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption("Touhou")
+
         self.clock = pygame.time.Clock()
         self.current_time = 0
         self.last_time_pause = 0
-
-        self.background = Background((800, 600), -7768, 1, 'assets/images/background/starfield.png')
-
-        self.life_heart = pygame.image.load('assets/images/interface/heart.png').subsurface(0, 0, 16, 16).convert_alpha()
-        self.life_heart = pygame.transform.scale(self.life_heart, (30, 30))
-
-        self.font = pygame.font.Font('assets/fonts/Silkscreen-Regular.ttf', 20)
 
         self.music_player = Music()
 
@@ -37,18 +31,17 @@ class Game:
 
         try:
             data = open('highscore.txt', 'r')
-            self.__highscore = int(data.read())
+            self.highscore = int(data.read())
             data.close()
         except IOError and ValueError:
-            self.__highscore = 0
+            self.highscore = 0
 
-        self.__score = 0
+        self.score = 0
         
         self.paused = False
-        self.botao_continue = Button(300, 200, 200, 50, "Continue", font_size=30)
-        self.botao_quit = Button(300, 300, 200, 50, "Quit", font_size=30)
-        self.botao_again = Button(300, 200, 200, 50, "Again", font_size=30)
-        self.botao_menu = Button(300, 400, 200, 50, "Return to Menu", font_size=30)
+        self.start_game = False
+
+        self.load_assets()
     
     @property
     def score(self):
@@ -65,6 +58,25 @@ class Game:
     @highscore.setter
     def highscore(self, value):
         self.__highscore = value
+    
+    def load_assets(self):
+        self.menu_background = pygame.image.load('assets/images/background/menu_inicial.png').convert_alpha()
+        self.menu_background = pygame.transform.scale(self.menu_background, (800, 600))
+        self.game_background = Background((800, 600), -7768, 1, 'assets/images/background/starfield.png')
+
+        self.life_heart = pygame.image.load('assets/images/interface/heart.png').subsurface(0, 0, 16, 16).convert_alpha()
+        self.life_heart = pygame.transform.scale(self.life_heart, (30, 30))
+
+        self.font = pygame.font.Font('assets/fonts/Silkscreen-Regular.ttf', 20)
+
+        self.main_menu_play_button = Button(x=105, y=200, width=150, height=50, text="PLAY")
+        self.main_menu_options_button = Button(x=105, y=300, width=150, height=50, text="OPTIONS")
+        self.main_menu_quit_button = Button(x=105, y=400, width=150, height=50, text="QUIT")
+
+        self.pause_screen_continue_button = Button(300, 200, 200, 50, "Continue", font_size=30)
+        self.pause_screen_quit_button = Button(300, 300, 200, 50, "Quit", font_size=30)
+        self.pause_screen_again_button = Button(300, 200, 200, 50, "Again", font_size=30)
+        self.pause_screen_menu_button = Button(300, 400, 200, 50, "Return to Menu", font_size=30)
     
     def handle_collision(self):
         for bullet in self.player_bullets:
@@ -111,7 +123,8 @@ class Game:
             self.music_player.current_ticks = current_ticks
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    pygame.quit()
+                    quit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.paused = not self.paused
@@ -121,9 +134,9 @@ class Game:
             if self.player.life <= 0:
                 self.last_time_pause = current_ticks
                 self.game_over()
-                self.botao_again.draw(self.screen)
-                self.botao_quit.draw(self.screen)
-                self.botao_menu.draw(self.screen)
+                self.pause_screen_again_button.draw(self.screen)
+                self.pause_screen_quit_button.draw(self.screen)
+                self.pause_screen_menu_button.draw(self.screen)
                 
                 self.update_highscore()
             elif not self.paused:
@@ -134,9 +147,9 @@ class Game:
             else:
                 # Atualiza a Tela de Pause e Desenha os Botões
                 self.paused_screen()
-                self.botao_continue.draw(self.screen)
-                self.botao_menu.draw(self.screen)
-                self.botao_quit.draw(self.screen)
+                self.pause_screen_continue_button.draw(self.screen)
+                self.pause_screen_menu_button.draw(self.screen)
+                self.pause_screen_quit_button.draw(self.screen)
 
                 self.music_player.music_select()
             
@@ -159,7 +172,7 @@ class Game:
             self.player_bullets.add(bullets)
 
         self.all_sprites = pygame.sprite.Group()
-        self.all_sprites.add(self.background, self.player, self.all_enemies, self.enemy_bullets, self.player_bullets)
+        self.all_sprites.add(self.game_background, self.player, self.all_enemies, self.enemy_bullets, self.player_bullets)
 
         self.all_sprites.update()
         self.all_sprites.draw(self.screen)
@@ -174,23 +187,23 @@ class Game:
 
     def paused_screen(self):
         # Atualiza os Botões
-        self.botao_continue.update()
-        self.botao_quit.update()
-        self.botao_menu.update()
+        self.pause_screen_continue_button.update()
+        self.pause_screen_quit_button.update()
+        self.pause_screen_menu_button.update()
 
         # Verifica Eventos
         if pygame.mouse.get_pressed()[0]:
             mouse_pos = pygame.mouse.get_pos()
-            if self.botao_continue.rect.collidepoint(mouse_pos):
+            if self.pause_screen_continue_button.rect.collidepoint(mouse_pos):
                 self.paused = False
                 self.music_player.pause_music()
-            elif self.botao_quit.rect.collidepoint(mouse_pos):
+            elif self.pause_screen_quit_button.rect.collidepoint(mouse_pos):
                 pygame.quit()
                 quit()
-            elif self.botao_menu.rect.collidepoint(mouse_pos):
-                menu = Menu()
-                menu.run_menu()
+            elif self.pause_screen_menu_button.rect.collidepoint(mouse_pos):
+                self.main_menu()
                 self.reset_game()
+                self.run()
 
     def game_over(self):
         pygame.mixer.music.stop()
@@ -201,27 +214,28 @@ class Game:
         self.screen.blit(game_over_text, text_rect)
 
         # Atualiza os Botões
-        self.botao_again.update()
-        self.botao_quit.update()
-        self.botao_menu.update()
+        self.pause_screen_again_button.update()
+        self.pause_screen_quit_button.update()
+        self.pause_screen_menu_button.update()
 
         # Verifica Eventos
         mouse_pressed = pygame.mouse.get_pressed()[0]
         if mouse_pressed:
             mouse_pos = pygame.mouse.get_pos()
-            if self.botao_again.rect.collidepoint(mouse_pos):
+            if self.pause_screen_again_button.rect.collidepoint(mouse_pos):
                 self.reset_game()
-            elif self.botao_quit.rect.collidepoint(mouse_pos):
+                self.run()
+            elif self.pause_screen_quit_button.rect.collidepoint(mouse_pos):
                 pygame.quit()
                 quit()
-            elif self.botao_menu.rect.collidepoint(mouse_pos):
-                    menu = Menu()
-                    menu.run_menu()
-                    self.reset_game()
+            elif self.pause_screen_menu_button.rect.collidepoint(mouse_pos):
+                self.main_menu()
+                self.reset_game()
+                self.run()
 
             # Atualiza a tela
             pygame.display.flip()
-            self.clock.tick(50)
+            self.clock.tick(40)
 
     def reset_game(self):
         # Reinicia a pontuação
@@ -250,6 +264,56 @@ class Game:
         self.music_player.music_pause = False
 
         self.paused = False
+    
+    def main_menu(self):
+        self.reset_game()
 
-        # Volta para o loop principal do jogo
-        self.run()
+        while not self.start_game:
+            self.screen.blit(self.menu_background, (0, 0))
+            
+            menu_text = pygame.font.Font(None, 100).render("MAIN MENU", True, "#b68f40")
+            menu_rect = menu_text.get_rect(center=(400, 100))
+            self.screen.blit(menu_text, menu_rect)
+
+
+            # Desenha e Atualiza os botões
+            self.main_menu_play_button.draw(self.screen)
+            self.main_menu_options_button.draw(self.screen)
+            self.main_menu_quit_button.draw(self.screen)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.main_menu_play_button.rect.collidepoint(event.pos):
+                        self.run()
+                    elif self.main_menu_options_button.rect.collidepoint(event.pos):
+                        self.options()
+                    elif self.main_menu_quit_button.rect.collidepoint(event.pos):
+                        pygame.quit()
+                        sys.exit()
+
+            pygame.display.update()
+    
+    def options(self):
+        while True:
+            mouse_pos = pygame.mouse.get_pos()
+
+            self.screen.fill("white")
+
+            # Cria Botão Para Voltar
+            options_back = Button(x=400, y=450, width=200, height=50, text="BACK")
+            options_back.update()
+            options_back.draw(self.screen)
+
+            # Verifica Eventos
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if options_back.rect.collidepoint(mouse_pos):
+                        return
+
+            pygame.display.update()
