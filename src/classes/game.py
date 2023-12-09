@@ -107,6 +107,8 @@ class Game:
         # Carrega o background
         self.menu_background = pygame.image.load('assets/images/background/main_menu.png').convert_alpha()
         self.menu_background = pygame.transform.scale(self.menu_background, (800, 600))
+        self.credits_background = pygame.image.load('assets/images/background/credits.png').convert_alpha()
+        self.credits_background = pygame.transform.scale(self.credits_background, (800, 600))
         self.game_background = Background((800, 600), -7768, 1, 'assets/images/background/starfield.png')
 
         # Carrega os sprites da interface
@@ -121,13 +123,13 @@ class Game:
         self.font = pygame.font.Font('assets/fonts/Silkscreen-Regular.ttf', 20)
 
         # Carrega os botões
-        self.main_menu_play_button = Button(x=105, y=200, width=150, height=50, text="PLAY")
-        self.main_menu_options_button = Button(x=105, y=300, width=150, height=50, text="OPTIONS")
-        self.main_menu_quit_button = Button(x=105, y=400, width=150, height=50, text="QUIT")
-        self.pause_screen_continue_button = Button(300, 200, 200, 50, "Continue", font_size=30)
-        self.pause_screen_quit_button = Button(300, 300, 200, 50, "Quit", font_size=30)
-        self.pause_screen_again_button = Button(300, 200, 200, 50, "Again", font_size=30)
-        self.pause_screen_menu_button = Button(300, 400, 200, 50, "Return to Menu", font_size=30)
+        self.main_menu_play_button = Button(105, 200, 150, 50, font_size=30 ,text="PLAY")
+        self.main_menu_credits_button = Button(105, 300, 150, 50, font_size=30, text="CREDITS")
+        self.main_menu_quit_button = Button(105, 400, 150, 50, font_size=30, text="QUIT")
+        self.pause_screen_continue_button = Button(300, 200, 200, 50, font_size=30, text= "Continue")
+        self.pause_screen_quit_button = Button(300, 300, 200, 50, font_size=30, text="Quit")
+        self.pause_screen_again_button = Button(300, 200, 200, 50, font_size=30, text="Again")
+        self.pause_screen_menu_button = Button(300, 400, 200, 50, font_size=30, text="Return to Menu")
     
     def handle_collision(self):
         """Verifica as colisões entre os sprites.
@@ -387,10 +389,9 @@ class Game:
             menu_rect = menu_text.get_rect(center=(400, 100))
             self.screen.blit(menu_text, menu_rect)
 
-
             # Desenha e Atualiza os botões
             self.main_menu_play_button.draw(self.screen)
-            self.main_menu_options_button.draw(self.screen)
+            self.main_menu_credits_button.draw(self.screen)
             self.main_menu_quit_button.draw(self.screen)
 
             for event in pygame.event.get():
@@ -400,26 +401,41 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.main_menu_play_button.rect.collidepoint(event.pos):
                         self.run()
-                    elif self.main_menu_options_button.rect.collidepoint(event.pos):
-                        self.options()
+                    elif self.main_menu_credits_button.rect.collidepoint(event.pos):
+                        self.credits()
                     elif self.main_menu_quit_button.rect.collidepoint(event.pos):
                         pygame.quit()
                         sys.exit()
 
             pygame.display.update()
     
-    def options(self):
-        """Atualiza a tela de opções.
+    def credits(self):
+        """Atualiza a tela de créditos.
         """
         while True:
             mouse_pos = pygame.mouse.get_pos()
 
-            self.screen.fill("white")
+            self.screen.blit(self.credits_background, (0, 0))
+
+            title = pygame.font.Font(None, 100).render("CREDITS", True, "#b68f40")
+            name_1 = pygame.font.Font(None, 40).render("YURE OLIVEIRA", True, "#b68f40")
+            name_2 = pygame.font.Font(None, 40).render("SAULO PIRES", True, "#b68f40")
+            name_3 = pygame.font.Font(None, 40).render("GABRIEL MATOS", True, "#b68f40")
+
+            title_rect = title.get_rect(center=(620, 100))
+            name_1_rect = name_1.get_rect(center=(620, 250))
+            name_2_rect = name_2.get_rect(center=(620, 300))
+            name_3_rect = name_3.get_rect(center=(620, 350))
+
+            self.screen.blit(title, title_rect)
+            self.screen.blit(name_1, name_1_rect)
+            self.screen.blit(name_2, name_2_rect)
+            self.screen.blit(name_3, name_3_rect)
 
             # Cria Botão Para Voltar
-            options_back = Button(x=400, y=450, width=200, height=50, text="BACK")
-            options_back.update()
-            options_back.draw(self.screen)
+            credits_back = Button(x=550, y=500, width=200, height=50, text="BACK")
+            credits_back.update()
+            credits_back.draw(self.screen)
 
             # Verifica Eventos
             for event in pygame.event.get():
@@ -427,7 +443,7 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if options_back.rect.collidepoint(mouse_pos):
+                    if credits_back.rect.collidepoint(mouse_pos):
                         return
 
             pygame.display.update()

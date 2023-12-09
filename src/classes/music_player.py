@@ -22,9 +22,10 @@ class Music:
 
         # Lista das músicas disponíveis
         self.music_list = [
+            'Remilia Scarlet\'s Theme - Septette for the Dead Princess',
             'Yukari\'s Theme - Necrofantasia',
             'Secret God Matara ~ Hidden Star in All Seasons',
-            'Remilia Scarlet\'s Theme - Septette for the Dead Princess']
+        ]
 
     def play_music(self):
         """Toca a música.
