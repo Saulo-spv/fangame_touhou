@@ -23,8 +23,8 @@ class Music:
         # Lista das músicas disponíveis
         self.music_list = [
             'Yukari\'s Theme - Necrofantasia',
-            'Touhou 16   Secret God Matara ~ Hidden Star in All Seasons (EX Okina Matara',
-            'EoSD Stage 6 Boss   Remilia Scarle']
+            'Secret God Matara ~ Hidden Star in All Seasons',
+            'Remilia Scarlet\'s Theme - Septette for the Dead Princess']
 
     def play_music(self):
         """Toca a música.
