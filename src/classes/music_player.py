@@ -21,8 +21,9 @@ class Music:
     def play_music(self):
         # Inicialização da música
         if not self.music_play:
-            pygame.mixer.music.load(f'assets/music/{self.music_list[self.actual_music]}.mp3')
+            pygame.mixer.music.load(f'assets/sound/music/{self.music_list[self.actual_music]}.mp3')
             pygame.mixer.music.play(loops=-1,fade_ms=1500)
+            pygame.mixer.music.set_volume(0.5)
             self.music_play = True
 
     def pause_music(self):
@@ -50,4 +51,4 @@ class Music:
                 if self.actual_music == 3:
                     self.actual_music = 0
                 pygame.mixer.music.unload()
-                pygame.mixer.music.load(f'assets/music/{self.music_list[self.actual_music]}.mp3')
+                pygame.mixer.music.load(f'assets/sound/music/{self.music_list[self.actual_music]}.mp3')

@@ -7,6 +7,8 @@ from classes.enemies import *
 from classes.button import Button
 from classes.spawner import Spawn
 from classes.music_player import Music
+from classes.effects import Effect
+from classes.power_up import PowerUp
 
 
 class Game:
@@ -28,6 +30,10 @@ class Game:
 
         self.player_bullets = pygame.sprite.Group()
         self.enemy_bullets = pygame.sprite.Group()
+
+        self.all_power_ups = pygame.sprite.Group()
+
+        self.all_effects = pygame.sprite.Group()
 
         try:
             data = open('highscore.txt', 'r')
@@ -67,6 +73,11 @@ class Game:
         self.life_heart = pygame.image.load('assets/images/interface/heart.png').subsurface(0, 0, 16, 16).convert_alpha()
         self.life_heart = pygame.transform.scale(self.life_heart, (30, 30))
 
+        self.shield_image = pygame.image.load('assets/images/power_ups/shield.png').convert_alpha()
+        self.shield_image = pygame.transform.scale(self.shield_image, (30, 30))
+
+        self.player_bullet_sound = pygame.mixer.Sound('assets/sound/effects/attack.wav')
+
         self.font = pygame.font.Font('assets/fonts/Silkscreen-Regular.ttf', 20)
 
         self.main_menu_play_button = Button(x=105, y=200, width=150, height=50, text="PLAY")
@@ -82,19 +93,44 @@ class Game:
         for bullet in self.player_bullets:
             for enemy in self.all_enemies:
                 if enemy.hitbox.colliderect(bullet.hitbox):
+                    if enemy.life == 1:
+                        # Cria o efeito de explosão
+                        if isinstance(enemy, SmallFairy):
+                            self.all_effects.add(Effect((enemy.rect.centerx, enemy.rect.centery+10), 'explosion_1'))
+                        elif (enemy, BigFairy):
+                            self.all_effects.add(Effect((enemy.rect.centerx, enemy.rect.centery+10), 'explosion_2'))
+                        
+                        # Dropa o power-up
+                        power_up = enemy.drop_power_up()
+                        if power_up is not None:
+                            self.all_power_ups.add(PowerUp((enemy.rect.centerx, enemy.rect.centery+10), power_up, self.player, self.enemy_bullets))
+                    
                     enemy.get_hit()
                     bullet.kill()
         
         for bullet in self.enemy_bullets:
             if self.player.hitbox.colliderect(bullet.hitbox):
-                self.player.get_hit()
+                # Verifica se o jogador está com o escudo
+                if self.player.shield:
+                    self.player.shield = False
+                else:
+                    self.player.get_hit()
+                
                 bullet.kill()
+        
+        for power_up in self.all_power_ups:
+            # Verifica se o jogador coletou o power-up
+            if self.player.hitbox.colliderect(power_up.hitbox):
+                power_up.collect()
     
     def update_interface(self):
         heart_x_pos = 40
         for i in range(self.player.life):
             self.screen.blit(self.life_heart, (10 + heart_x_pos, 20))
             heart_x_pos += 40
+        
+        if self.player.shield:
+            self.screen.blit(self.shield_image, (10 + heart_x_pos, 20))
         
         score_label = self.font.render(f'SCORE: {self.score}', 1, (255, 0, 0))
         self.screen.blit(score_label, (550,15))
@@ -168,11 +204,13 @@ class Game:
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_j] and self.player.can_shoot():
+            self.player_bullet_sound.play()
             bullets = self.player.spawn_bullets()
             self.player_bullets.add(bullets)
 
         self.all_sprites = pygame.sprite.Group()
-        self.all_sprites.add(self.game_background, self.player, self.all_enemies, self.enemy_bullets, self.player_bullets)
+        self.all_sprites.add(self.game_background, self.player, self.all_enemies, self.enemy_bullets,
+                             self.player_bullets, self.all_power_ups, self.all_effects)
 
         self.all_sprites.update()
         self.all_sprites.draw(self.screen)
@@ -255,6 +293,8 @@ class Game:
         self.all_enemies.empty()
         self.player_bullets.empty()
         self.enemy_bullets.empty()
+        self.all_power_ups.empty()
+        self.all_effects.empty()
 
         # Reinicia o spawn
         self.spawn_manager.reset()
