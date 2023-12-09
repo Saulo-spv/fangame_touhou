@@ -1,0 +1,3 @@
+life_potion.png, shield.png, clear_bullets.png
+Extraído de: https://seikio.itch.io/itemazing-tileset
+Criado por: Seikia
