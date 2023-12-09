@@ -20,6 +20,9 @@ Jogo baseado em Touhou, feito com propósitos acadêmicos.
 ## Objetivo
 O objetivo do jogo é sobreviver o maior tempo possível, tendo para isso que eliminar os inimigos e coletar os power-ups deixados por eles.
 
+## Documentação
+A documentação das classes criadas está disponível em: https://saulo-spv.github.io/fangame_touhou/index.html
+
 ## Equipe
 - [Yure Santos de Oliveira](https://github.com/yyure)
 - [Gabriel Matos dos Santos](https://github.com/santos-gmatos)
