@@ -5,6 +5,8 @@ from classes.background import Background
 from classes.enemies import *
 from classes.button import Button
 from classes.spawner import Spawn
+from classes.menu import Menu
+from classes.music_player import Music
 
 
 class Game:
@@ -21,6 +23,8 @@ class Game:
         self.life_heart = pygame.transform.scale(self.life_heart, (30, 30))
 
         self.font = pygame.font.Font('assets/fonts/Silkscreen-Regular.ttf', 20)
+
+        self.music_player = Music()
 
         self.player = Player()
 
@@ -43,6 +47,8 @@ class Game:
         self.paused = False
         self.botao_continue = Button(300, 200, 200, 50, "Continue", font_size=30)
         self.botao_quit = Button(300, 300, 200, 50, "Quit", font_size=30)
+        self.botao_again = Button(300, 200, 200, 50, "Again", font_size=30)
+        self.botao_menu = Button(300, 400, 200, 50, "Return to Menu", font_size=30)
     
     @property
     def score(self):
@@ -101,6 +107,8 @@ class Game:
         running = True
         while running:
             current_ticks = pygame.time.get_ticks()
+            self.music_player.play_music()
+            self.music_player.current_ticks = current_ticks
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -108,8 +116,16 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         self.paused = not self.paused
                         self.last_time_pause = pygame.time.get_ticks()
+                        self.music_player.pause_music()
 
-            if not self.paused:
+            if self.player.life <= 0:
+                self.last_time_pause = current_ticks
+                self.game_over()
+                self.botao_again.draw(self.screen)
+                self.botao_quit.draw(self.screen)
+                self.botao_menu.draw(self.screen)
+                self.update_highscore()
+            elif not self.paused:
                 self.current_time += current_ticks - self.last_time_pause
                 self.last_time_pause = current_ticks
                 self.update_game()
@@ -117,11 +133,10 @@ class Game:
                 # Atualiza a Tela de Pause e Desenha os Botões
                 self.paused_screen()
                 self.botao_continue.draw(self.screen)
+                self.botao_menu.draw(self.screen)
                 self.botao_quit.draw(self.screen)
-            
-            if self.player.life <= 0:
-                running = False
-                self.update_highscore()
+
+                self.music_player.music_select()
             
             pygame.display.flip()
 
@@ -159,12 +174,80 @@ class Game:
         # Atualiza os Botões
         self.botao_continue.update()
         self.botao_quit.update()
+        self.botao_menu.update()
 
         # Verifica Eventos
         if pygame.mouse.get_pressed()[0]:
             mouse_pos = pygame.mouse.get_pos()
             if self.botao_continue.rect.collidepoint(mouse_pos):
                 self.paused = False
+                self.music_player.pause_music()
             elif self.botao_quit.rect.collidepoint(mouse_pos):
                 pygame.quit()
                 quit()
+            elif self.botao_menu.rect.collidepoint(mouse_pos): 
+                    menu = Menu()
+                    menu.run_menu()
+                    self.reset_game()
+
+    def game_over(self):
+        pygame.mixer.music.stop()
+
+        # Escreve Game Over
+        game_over_text = self.font.render("Game Over", True, (255, 0, 0))
+        text_rect = game_over_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 5))
+        self.screen.blit(game_over_text, text_rect)
+
+        # Atualiza os Botões
+        self.botao_again.update()
+        self.botao_quit.update()
+        self.botao_menu.update()
+
+        # Verifica Eventos
+        mouse_pressed = pygame.mouse.get_pressed()[0]
+        if mouse_pressed:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.botao_again.rect.collidepoint(mouse_pos):
+                self.reset_game()
+            elif self.botao_quit.rect.collidepoint(mouse_pos):
+                pygame.quit()
+                quit()
+            elif self.botao_menu.rect.collidepoint(mouse_pos):
+                    menu = Menu()
+                    menu.run_menu()
+                    self.reset_game()
+
+            # Atualiza a tela
+            pygame.display.flip()
+            self.clock.tick(50)
+
+    def reset_game(self):
+        # Reinicia a pontuação
+        self.score = 0
+
+        # Reposiciona o jogador no lugar de início
+        self.player.rect.x = 400
+        self.player.rect.y = 550
+
+        # Reinicia a vida do jogador
+        self.player.life = 3
+
+        # Reinicia o tempo
+        self.current_time = 0
+
+        # Limpa os grupos de sprites
+        self.all_enemies.empty()
+        self.player_bullets.empty()
+        self.enemy_bullets.empty()
+
+        # Reinicia o spawn
+        self.spawn_manager.reset()
+
+        # Reinicia a música
+        self.music_player.music_play = False
+        self.music_player.music_pause = False
+
+        self.paused = False
+
+        # Volta para o loop principal do jogo
+        self.run()
