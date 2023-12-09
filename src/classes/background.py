@@ -1,7 +1,26 @@
+"""Classe Background
+
+Módulo responsável por implementar a classe Background, que representa o background do jogo.
+
+"""
 import pygame
 
+
 class Background(pygame.sprite.Sprite):
-    def __init__(self, screen_size, initial_pos, speed, filename):
+    def __init__(self, screen_size: tuple[int, int], initial_pos: int, speed: int, filename: str):
+        """Inicializa uma nova instância da classe Background.
+
+        Parameters
+        ----------
+        screen_size : tuple[int, int]
+            O tamanho da tela.
+        initial_pos : int
+            A posição vertical inicial da imagem.
+        speed : int
+            A velocidade de movimento da imagem.
+        filename : str
+            O nome do arquivo da imagem.
+        """
         super().__init__()
 
         # Tamanho da tela e velocidade de movimento
@@ -18,10 +37,9 @@ class Background(pygame.sprite.Sprite):
         # Posição inicial da imagem
         self.y = self.initial_pos
     
-    def get_surface(self):
-        return self.image
-    
     def update(self):
+        """Atualiza o background.
+        """
         # Atualiza a posição da imagem
         self.y += self.speed
 
