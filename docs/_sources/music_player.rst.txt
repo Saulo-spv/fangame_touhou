@@ -1,0 +1,7 @@
+Classe Music
+============
+
+.. autoclass:: classes.music_player.Music
+   :members:
+   :undoc-members:
+   :show-inheritance:

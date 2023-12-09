@@ -1,0 +1,17 @@
+Classe Enemy
+============
+
+.. autoclass:: classes.enemies.Enemy
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: classes.enemies.BigFairy
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: classes.enemies.SmallFairy
+    :members:
+    :undoc-members:
+    :show-inheritance:

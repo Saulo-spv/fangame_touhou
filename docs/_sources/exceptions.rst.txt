@@ -1,0 +1,17 @@
+Exceções
+========
+
+.. autoclass:: classes.exceptions.InvalidTypeException
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: classes.exceptions.InvalidPositionException
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: classes.exceptions.NoImageException
+    :members:
+    :undoc-members:
+    :show-inheritance:

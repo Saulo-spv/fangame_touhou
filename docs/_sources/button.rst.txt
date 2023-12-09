@@ -1,0 +1,7 @@
+Classe Button
+=============
+
+.. autoclass:: classes.button.Button
+   :members:
+   :show-inheritance:
+   :inherited-members:

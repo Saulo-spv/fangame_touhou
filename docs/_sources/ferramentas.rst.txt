@@ -1,0 +1,12 @@
+Ferramentas do jogo
+===================
+
+.. toctree::
+    :maxdepth: 2
+    
+    game
+    spawner
+    music_player
+    effects
+    button
+    background

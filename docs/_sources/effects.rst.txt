@@ -1,0 +1,7 @@
+Classe Effect
+=============
+
+.. autoclass:: classes.effects.Effect
+   :members:
+   :undoc-members:
+   :show-inheritance:

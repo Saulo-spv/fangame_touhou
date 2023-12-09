@@ -1,0 +1,7 @@
+Classe PowerUp
+==============
+
+.. autoclass:: classes.power_up.PowerUp
+    :members:
+    :undoc-members:
+    :show-inheritance:

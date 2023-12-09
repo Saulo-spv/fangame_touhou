@@ -1,0 +1,7 @@
+Classe Player
+=============
+
+.. autoclass:: classes.player.Player
+   :members:
+   :undoc-members:
+   :show-inheritance:

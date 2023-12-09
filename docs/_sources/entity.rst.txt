@@ -1,0 +1,7 @@
+Classe Entity
+=============
+
+.. autoclass:: classes.entity.Entity
+   :members:
+   :undoc-members:
+   :show-inheritance:

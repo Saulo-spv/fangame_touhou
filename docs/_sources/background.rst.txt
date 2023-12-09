@@ -1,0 +1,7 @@
+Classe Background
+=================
+
+.. autoclass:: classes.background.Background
+   :members:
+   :undoc-members:
+   :show-inheritance:

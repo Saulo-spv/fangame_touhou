@@ -1,0 +1,7 @@
+Classe Game
+===========
+
+.. autoclass:: classes.game.Game
+    :members:
+    :undoc-members:
+    :show-inheritance:

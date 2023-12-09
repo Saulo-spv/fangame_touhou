@@ -1,0 +1,11 @@
+Objetos do jogo
+===============
+
+.. toctree::
+   :maxdepth: 2
+   
+   entity
+   player
+   enemies
+   bullets
+   power_up

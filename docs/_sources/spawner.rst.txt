@@ -1,0 +1,7 @@
+Classe Spawn
+============
+
+.. autoclass:: classes.spawner.Spawn
+    :members:
+    :undoc-members:
+    :show-inheritance:

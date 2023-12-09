@@ -1,0 +1,7 @@
+Classe Bullet
+=============
+
+.. autoclass:: classes.bullets.Bullet
+   :members:
+   :undoc-members:
+   :show-inheritance:
