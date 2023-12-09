@@ -66,7 +66,7 @@ class Game:
         self.__highscore = value
     
     def load_assets(self):
-        self.menu_background = pygame.image.load('assets/images/background/menu_inicial.png').convert_alpha()
+        self.menu_background = pygame.image.load('assets/images/background/main_menu.png').convert_alpha()
         self.menu_background = pygame.transform.scale(self.menu_background, (800, 600))
         self.game_background = Background((800, 600), -7768, 1, 'assets/images/background/starfield.png')
 
