@@ -64,3 +64,11 @@ class Spawn:
                     if current_time - self._last_spawn_time[fairy_type][i] > self.cooldown:
                         self._last_spawn_time[fairy_type][i] = current_time
                         self.all_enemies.add(fairy_type(i+1))
+
+    def reset(self):
+        # Reseta as variváveis modificadas em game.py
+        self.current_time = 0
+        self.max_quantity = {SmallFairy:[2,0], BigFairy:[0,0,0]}
+        self._last_spawn_time = {SmallFairy:[0,0], BigFairy:[0,0,0]}
+        self.cooldown = 2500
+        self.all_enemies.empty()
