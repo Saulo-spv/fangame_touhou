@@ -7,32 +7,65 @@ from classes.entity import Entity
 
 
 class Enemy(Entity, ABC):
-    def __init__(self, life, shoot_cooldown):
+    def __init__(self, life: int, shoot_cooldown: int):
+        """Inicializa uma nova instância da classe Enemy.
+
+        Parameters
+        ----------
+        life : int
+            A quantidade inicial de vida do inimigo.
+        shoot_cooldown : int
+            O tempo de espera entre disparos.
+        """
         super().__init__(life, shoot_cooldown)
 
     @abstractmethod
     def move(self):
+        """Move o inimigo.
+        """
         pass
 
     @abstractmethod
     def update_animation(self):
+        """Atualiza a animação do inimigo.
+        """
         pass
 
     @abstractmethod
     def update_hitbox(self):
+        """Atualiza a hitbox do inimigo.
+        """
         pass
 
     @abstractmethod
     def recharge(self):
+        """Recarrega a arma do inimigo.
+        """
         pass
 
     def screen_limit(self):
+        """Verifica se o inimigo saiu da tela.
+        """
         if self.rect.top >= 600:
             self.kill()
+    
+    def drop_power_up(self):
+        """
+        """
+        if random.randint(0, 100) <= 10:
+            power_up = random.choice(['life', 'shield', 'clear_bullets'])
+            return power_up
 
 
 class BigFairy(Enemy):
     def __init__(self, enemy_type):
+        """Inicializa uma nova instância da classe BigFairy.
+
+        Parameters
+        ----------
+        enemy_type : int
+            O tipo do inimigo.
+        """
         self.type = enemy_type
 
         self._sprites = [pygame.image.load(f"assets/images/enemies/fairy{self.type}_{i}.png") for i in range(4)]
@@ -44,7 +77,7 @@ class BigFairy(Enemy):
         self._animation_count = 0
         self._last_frame_time = 0
         self._animation_cooldown = 70
-
+        
         self.rect = self.image.get_rect()
         self.rect.bottom = 0
         self.rect.x = random.randint(20, 780)
@@ -64,6 +97,8 @@ class BigFairy(Enemy):
         super().__init__(10, shoot_cooldown)
 
     def update_animation(self):
+        """Atualiza a animação do inimigo.
+        """
         current_time = pygame.time.get_ticks()
 
         if self._x_speed == 0:
@@ -97,6 +132,8 @@ class BigFairy(Enemy):
                 self.image = self._sprites_turn[self._animation_count]
 
     def move(self):
+        """Move o inimigo.
+        """
         if self.rect.y >= self._stay_y:
             self._x_speed = 0
             self._y_speed = 0
@@ -108,9 +145,18 @@ class BigFairy(Enemy):
                 self._x_speed *= -1
     
     def update_hitbox(self):
+        """Atualiza a hitbox do inimigo.
+        """
         self.hitbox = (self.rect.x, self.rect.y, 50, 50)
     
-    def recharge(self):
+    def recharge(self) -> pygame.sprite.Group:
+        """Recarrega a arma do inimigo.
+
+        Returns
+        -------
+        pygame.sprite.Group
+            O grupo de sprites com os novos tiros.
+        """
         if self.type == 1:
             bullets = [
                 Bullet((self.rect.centerx, self.rect.centery), 2, 0, 'enemy_1'),
@@ -136,7 +182,14 @@ class BigFairy(Enemy):
 
 
 class SmallFairy(Enemy):
-    def __init__(self, enemy_type):
+    def __init__(self, enemy_type: int):
+        """Inicializa uma nova instância da classe SmallFairy.
+
+        Parameters
+        ----------
+        enemy_type : int
+            O tipo do inimigo.
+        """
         super().__init__(4, 800)
 
         self.type = enemy_type
@@ -159,6 +212,8 @@ class SmallFairy(Enemy):
         self._y_speed = random.uniform(0.8, 0.9)
 
     def update_animation(self):
+        """Atualiza a animação do inimigo.
+        """
         current_time = pygame.time.get_ticks()
 
         if current_time - self._last_frame_time > self._animation_cooldown:
@@ -172,6 +227,8 @@ class SmallFairy(Enemy):
             self.image = self._sprites[self._animation_count]
 
     def move(self):
+        """Move o inimigo.
+        """
         self.rect.x += self._x_speed
         self.rect.y += self._y_speed
 
@@ -179,9 +236,18 @@ class SmallFairy(Enemy):
             self._x_speed *= -1
     
     def update_hitbox(self):
+        """Atualiza a hitbox do inimigo.
+        """
         self.hitbox = (self.rect.x, self.rect.y, 30, 30)
     
-    def recharge(self):
+    def recharge(self) -> pygame.sprite.Group:
+        """Recarrega a arma do inimigo.
+
+        Returns
+        -------
+        pygame.sprite.Group
+            O grupo de sprites com os novos tiros.
+        """
         degrees = random.randint(0, 180)
 
         bullet = Bullet((self.rect.centerx, self.rect.top), 2, degrees, 'enemy_4')
