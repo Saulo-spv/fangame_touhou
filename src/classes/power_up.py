@@ -25,6 +25,7 @@ class PowerUp(pygame.sprite.Sprite):
 
         self.type = type
 
+        # Configura a imagem do power-up
         if self.type == 'life':
             self.image = pygame.image.load('assets/images/power_ups/life_potion.png').convert_alpha()
         elif self.type == 'shield':

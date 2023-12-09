@@ -5,6 +5,8 @@ Módulo responsável por implementar a classe Background, que representa o backg
 """
 import pygame
 
+from classes.exceptions import *
+
 
 class Background(pygame.sprite.Sprite):
     def __init__(self, screen_size: tuple[int, int], initial_pos: int, speed: int, filename: str):
@@ -32,7 +34,11 @@ class Background(pygame.sprite.Sprite):
         self.image = pygame.Surface(self.screen_size)
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = (0,0)
-        self.background = pygame.image.load(filename).convert()
+
+        try:
+            self.background = pygame.image.load(filename).convert()
+        except pygame.error:
+            raise NoImageException()
 
         # Posição inicial da imagem
         self.y = self.initial_pos

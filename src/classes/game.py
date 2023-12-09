@@ -1,3 +1,8 @@
+"""Classe Game
+
+Módulo responsável por implementar a classe Game, que representa o jogo.
+
+"""
 import pygame
 import sys
 
@@ -13,9 +18,12 @@ from classes.power_up import PowerUp
 
 class Game:
     def __init__(self):
+        """Inicializa uma nova instância da classe Game.
+        """
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption("Touhou")
 
+        # Inicializa o Relógio
         self.clock = pygame.time.Clock()
         self.current_time = 0
         self.last_time_pause = 0
@@ -25,7 +33,6 @@ class Game:
         self.player = Player()
 
         self.all_enemies = pygame.sprite.Group()
-
         self.spawn_manager = Spawn(self.all_enemies)
 
         self.player_bullets = pygame.sprite.Group()
@@ -35,6 +42,7 @@ class Game:
 
         self.all_effects = pygame.sprite.Group()
 
+        # Carrega a pontuação máxima
         try:
             data = open('highscore.txt', 'r')
             self.highscore = int(data.read())
@@ -50,46 +58,80 @@ class Game:
         self.load_assets()
     
     @property
-    def score(self):
+    def score(self) -> int:
+        """Obtém a pontuação atual.
+
+        Returns
+        -------
+        int
+            A pontuação atual.
+        """
         return self.__score
     
     @score.setter
-    def score(self, value):
+    def score(self, value: int):
+        """Define a pontuação atual.
+
+        Parameters
+        ----------
+        value : int
+            A nova pontuação atual.
+        """
         self.__score = value
     
     @property
-    def highscore(self):
+    def highscore(self) -> int:
+        """Obtém a pontuação máxima.
+
+        Returns
+        -------
+        int
+            A pontuação máxima.
+        """
         return self.__highscore
     
     @highscore.setter
-    def highscore(self, value):
+    def highscore(self, value: int):
+        """Define a pontuação máxima.
+
+        Parameters
+        ----------
+        value : int
+            A nova pontuação máxima.
+        """
         self.__highscore = value
     
     def load_assets(self):
+        """Carrega os assets do jogo.
+        """
+        # Carrega o background
         self.menu_background = pygame.image.load('assets/images/background/main_menu.png').convert_alpha()
         self.menu_background = pygame.transform.scale(self.menu_background, (800, 600))
         self.game_background = Background((800, 600), -7768, 1, 'assets/images/background/starfield.png')
 
+        # Carrega os sprites da interface
         self.life_heart = pygame.image.load('assets/images/interface/heart.png').subsurface(0, 0, 16, 16).convert_alpha()
         self.life_heart = pygame.transform.scale(self.life_heart, (30, 30))
-
         self.shield_image = pygame.image.load('assets/images/power_ups/shield.png').convert_alpha()
         self.shield_image = pygame.transform.scale(self.shield_image, (30, 30))
 
+        # Carrega os sons
         self.player_bullet_sound = pygame.mixer.Sound('assets/sound/effects/attack.wav')
 
         self.font = pygame.font.Font('assets/fonts/Silkscreen-Regular.ttf', 20)
 
+        # Carrega os botões
         self.main_menu_play_button = Button(x=105, y=200, width=150, height=50, text="PLAY")
         self.main_menu_options_button = Button(x=105, y=300, width=150, height=50, text="OPTIONS")
         self.main_menu_quit_button = Button(x=105, y=400, width=150, height=50, text="QUIT")
-
         self.pause_screen_continue_button = Button(300, 200, 200, 50, "Continue", font_size=30)
         self.pause_screen_quit_button = Button(300, 300, 200, 50, "Quit", font_size=30)
         self.pause_screen_again_button = Button(300, 200, 200, 50, "Again", font_size=30)
         self.pause_screen_menu_button = Button(300, 400, 200, 50, "Return to Menu", font_size=30)
     
     def handle_collision(self):
+        """Verifica as colisões entre os sprites.
+        """
         for bullet in self.player_bullets:
             for enemy in self.all_enemies:
                 if enemy.hitbox.colliderect(bullet.hitbox):
@@ -124,6 +166,8 @@ class Game:
                 power_up.collect()
     
     def update_interface(self):
+        """Atualiza a interface do jogo.
+        """
         heart_x_pos = 40
         for i in range(self.player.life):
             self.screen.blit(self.life_heart, (10 + heart_x_pos, 20))
@@ -139,24 +183,34 @@ class Game:
         self.screen.blit(highscore_label, (550,40))
     
     def update_score(self):
+        """Atualiza a pontuação do jogo.
+        """
         self.score += 2
 
         if self.score >= self.highscore:
             self.highscore = self.score
     
     def update_highscore(self):
+        """Atualiza a pontuação máxima do jogo.
+        """
         if self.highscore == self.score:
             data = open('highscore.txt', 'w')
             data.write(str(self.highscore))
             data.close()
     
     def run(self):
+        """Executa o jogo.
+        """
         # Loop principal do jogo
         running = True
         while running:
+            # Atualiza o tempo
             current_ticks = pygame.time.get_ticks()
+
+            # Atualiza a música
             self.music_player.play_music()
             self.music_player.current_ticks = current_ticks
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -167,9 +221,12 @@ class Game:
                         self.last_time_pause = pygame.time.get_ticks()
                         self.music_player.pause_music()
 
+            # Verifica se o jogador perdeu
             if self.player.life <= 0:
                 self.last_time_pause = current_ticks
+
                 self.game_over()
+
                 self.pause_screen_again_button.draw(self.screen)
                 self.pause_screen_quit_button.draw(self.screen)
                 self.pause_screen_menu_button.draw(self.screen)
@@ -183,6 +240,7 @@ class Game:
             else:
                 # Atualiza a Tela de Pause e Desenha os Botões
                 self.paused_screen()
+
                 self.pause_screen_continue_button.draw(self.screen)
                 self.pause_screen_menu_button.draw(self.screen)
                 self.pause_screen_quit_button.draw(self.screen)
@@ -193,25 +251,31 @@ class Game:
 
     # Atualiza o Jogo
     def update_game(self):
+        """Atualiza o jogo.
+        """
         # Surgimento dos inimigos
         self.spawn_manager.current_time = self.current_time
         self.spawn_manager.spawn()
         
+        # Realiza os disparos dos inimigos
         for enemy in self.all_enemies:
             if enemy.can_shoot():
                 bullets = enemy.spawn_bullets()
                 self.enemy_bullets.add(bullets)
 
+        # Realiza os disparos do jogador
         keys = pygame.key.get_pressed()
         if keys[pygame.K_j] and self.player.can_shoot():
             self.player_bullet_sound.play()
             bullets = self.player.spawn_bullets()
             self.player_bullets.add(bullets)
 
+        # Cria grupo com todos os sprites
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.game_background, self.player, self.all_enemies, self.enemy_bullets,
                              self.player_bullets, self.all_power_ups, self.all_effects)
 
+        # Atualiza os sprites
         self.all_sprites.update()
         self.all_sprites.draw(self.screen)
         
@@ -224,6 +288,8 @@ class Game:
         self.clock.tick(50)
 
     def paused_screen(self):
+        """Atualiza a tela de pause.
+        """
         # Atualiza os Botões
         self.pause_screen_continue_button.update()
         self.pause_screen_quit_button.update()
@@ -244,6 +310,8 @@ class Game:
                 self.run()
 
     def game_over(self):
+        """Atualiza a tela de Game Over.
+        """
         pygame.mixer.music.stop()
 
         # Escreve Game Over
@@ -276,6 +344,8 @@ class Game:
             self.clock.tick(40)
 
     def reset_game(self):
+        """Reinicia o jogo.
+        """
         # Reinicia a pontuação
         self.score = 0
 
@@ -306,6 +376,8 @@ class Game:
         self.paused = False
     
     def main_menu(self):
+        """Atualiza a tela de menu principal.
+        """
         self.reset_game()
 
         while not self.start_game:
@@ -337,6 +409,8 @@ class Game:
             pygame.display.update()
     
     def options(self):
+        """Atualiza a tela de opções.
+        """
         while True:
             mouse_pos = pygame.mouse.get_pos()
 
