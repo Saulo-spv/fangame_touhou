@@ -7,6 +7,7 @@ from classes.enemies import *
 from classes.button import Button
 from classes.spawner import Spawn
 from classes.music_player import Music
+from classes.effects import Effect
 
 
 class Game:
@@ -28,6 +29,8 @@ class Game:
 
         self.player_bullets = pygame.sprite.Group()
         self.enemy_bullets = pygame.sprite.Group()
+
+        self.all_effects = pygame.sprite.Group()
 
         try:
             data = open('highscore.txt', 'r')
@@ -67,6 +70,8 @@ class Game:
         self.life_heart = pygame.image.load('assets/images/interface/heart.png').subsurface(0, 0, 16, 16).convert_alpha()
         self.life_heart = pygame.transform.scale(self.life_heart, (30, 30))
 
+        self.player_bullet_sound = pygame.mixer.Sound('assets/sound/effects/attack.wav')
+
         self.font = pygame.font.Font('assets/fonts/Silkscreen-Regular.ttf', 20)
 
         self.main_menu_play_button = Button(x=105, y=200, width=150, height=50, text="PLAY")
@@ -82,6 +87,12 @@ class Game:
         for bullet in self.player_bullets:
             for enemy in self.all_enemies:
                 if enemy.hitbox.colliderect(bullet.hitbox):
+                    # Cria o efeito de explosão
+                    if enemy.life == 1 and isinstance(enemy, SmallFairy):
+                        self.all_effects.add(Effect((enemy.rect.centerx, enemy.rect.centery+10), 'explosion_1'))
+                    elif enemy.life == 1 and isinstance(enemy, BigFairy):
+                        self.all_effects.add(Effect((enemy.rect.centerx, enemy.rect.centery+10), 'explosion_2'))
+                        
                     enemy.get_hit()
                     bullet.kill()
         
@@ -168,11 +179,12 @@ class Game:
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_j] and self.player.can_shoot():
+            self.player_bullet_sound.play()
             bullets = self.player.spawn_bullets()
             self.player_bullets.add(bullets)
 
         self.all_sprites = pygame.sprite.Group()
-        self.all_sprites.add(self.game_background, self.player, self.all_enemies, self.enemy_bullets, self.player_bullets)
+        self.all_sprites.add(self.game_background, self.player, self.all_enemies, self.enemy_bullets, self.player_bullets, self.all_effects)
 
         self.all_sprites.update()
         self.all_sprites.draw(self.screen)
@@ -255,6 +267,7 @@ class Game:
         self.all_enemies.empty()
         self.player_bullets.empty()
         self.enemy_bullets.empty()
+        self.all_effects.empty()
 
         # Reinicia o spawn
         self.spawn_manager.reset()
